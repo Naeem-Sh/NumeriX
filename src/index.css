@@ -1,0 +1,242 @@
+@import "tailwindcss";
+
+:root {
+  /* =========================================================================
+     Responsive Fluid Clamp Scale for Laptops (1366x768), HD, 2K, and 4K Displays
+     ========================================================================= */
+
+  /* Global Layout Fluid Spacing */
+  --fluid-page-px: clamp(0.75rem, 1.5vw, 3rem);
+  --fluid-page-py: clamp(0.5rem, 1vh + 0.25rem, 2rem);
+  --fluid-grid-gap: clamp(0.75rem, 1.2vw + 0.25rem, 2rem);
+
+  /* Calculator Display Scale */
+  --fluid-display-result: clamp(2rem, 2.5vw + 1rem, 4.75rem);
+  --fluid-display-min-h: clamp(48px, 4vh + 24px, 110px);
+  --fluid-display-expression: clamp(0.8rem, 0.4vw + 0.65rem, 1.25rem);
+
+  /* Keypad Dynamic Sizing & Enhanced Number Typography */
+  --fluid-btn-py: clamp(0.45rem, 0.6vh + 0.25rem, 1.25rem);
+  --fluid-btn-num-size: clamp(1.15rem, 0.8vw + 0.75rem, 2.25rem);
+  --fluid-btn-op-size: clamp(1.05rem, 0.7vw + 0.7rem, 2rem);
+  --fluid-btn-fn-size: clamp(0.7rem, 0.3vw + 0.55rem, 1.05rem);
+  --fluid-btn-enter-size: clamp(1.1rem, 0.8vw + 0.75rem, 2.25rem);
+
+  /* 20-Line Paper Tape Dynamic Scaling */
+  --fluid-tape-min-h: clamp(260px, 35vh, 650px);
+  --fluid-tape-max-h: clamp(380px, 55vh, 900px);
+  --fluid-tape-result-size: clamp(1rem, 0.5vw + 0.8rem, 1.75rem);
+  --fluid-tape-exp-size: clamp(0.75rem, 0.3vw + 0.6rem, 1.1rem);
+
+  /* Analog Clock Dial Size */
+  --fluid-clock-dial: clamp(40px, 1.8vw + 20px, 64px);
+}
+
+@layer base {
+  /* Fluid root scaling for rem-based elements across 1366x768, 1080p, 1440p, and 4K */
+  html {
+    font-size: clamp(13.5px, 0.18vw + 11.5px, 18px);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+
+  code, kbd, samp, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-feature-settings: 'tnum' on, 'zero' on;
+  }
+}
+
+/* Fluid Utility Classes leveraging clamp properties */
+.fluid-calculator-display-result {
+  font-size: var(--fluid-display-result);
+  min-height: var(--fluid-display-min-h);
+}
+
+.fluid-keypad-btn {
+  padding-top: var(--fluid-btn-py);
+  padding-bottom: var(--fluid-btn-py);
+}
+
+.fluid-keypad-num {
+  font-size: var(--fluid-btn-num-size);
+}
+
+.fluid-keypad-op {
+  font-size: var(--fluid-btn-op-size);
+}
+
+.fluid-keypad-fn {
+  font-size: var(--fluid-btn-fn-size);
+}
+
+.fluid-keypad-enter {
+  font-size: var(--fluid-btn-enter-size);
+}
+
+.fluid-tape-container {
+  min-height: var(--fluid-tape-min-h);
+  max-height: var(--fluid-tape-max-h);
+}
+
+.fluid-clock-dial-size {
+  width: var(--fluid-clock-dial);
+  height: var(--fluid-clock-dial);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4);
+}
+
+/* =========================================================================
+   Display Shader Styles (VFD Emerald, Amber Glow, OLED Ice, Classic LCD)
+   ========================================================================= */
+.shader-vfd-emerald {
+  color: #34d399;
+  text-shadow: 0 0 12px rgba(52, 211, 153, 0.65), 0 0 24px rgba(16, 185, 129, 0.35);
+  background: radial-gradient(circle at center, #022c22 0%, #031713 70%, #020b08 100%);
+  border-color: #065f46;
+}
+
+.shader-amber-glow {
+  color: #fbbf24;
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
+  background: radial-gradient(circle at center, #2e1065/0 0%, #261205 70%, #150902 100%);
+  border-color: #78350f;
+}
+
+.shader-oled-ice {
+  color: #f8fafc;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 0 0 16px rgba(56, 189, 248, 0.3);
+  background: radial-gradient(circle at center, #0f172a 0%, #050b14 70%, #020408 100%);
+  border-color: #1e293b;
+}
+
+.shader-classic-lcd {
+  color: #0f172a;
+  text-shadow: none;
+  background: #cbd5e1;
+  border-color: #94a3b8;
+}
+
+/* =========================================================================
+   Sculpted 3D Keycap Physics & Key Touch Shadows
+   ========================================================================= */
+.keycap-sculpted {
+  position: relative;
+  transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.06s ease;
+  box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.35), 0 5px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.keycap-sculpted:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.35), 0 2px 3px -1px rgba(0, 0, 0, 0.2);
+}
+
+.keycap-light-sculpted {
+  position: relative;
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+  box-shadow: 0 3px 0 0 #cbd5e1, 0 4px 5px -1px rgba(0, 0, 0, 0.08);
+}
+
+.keycap-light-sculpted:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 #cbd5e1, 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Exclusive Tactile Hover Effect for Number Keys (0, 1, 2, ..., 9) */
+.fluid-keypad-num {
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.keycap-sculpted.fluid-keypad-num:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 0 rgba(0, 0, 0, 0.45), 0 8px 14px -1px rgba(6, 182, 212, 0.3);
+  border-color: rgba(6, 182, 212, 0.75);
+}
+
+.keycap-light-sculpted.fluid-keypad-num:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 0 #94a3b8, 0 8px 14px -1px rgba(14, 165, 233, 0.25);
+  border-color: #0284c7;
+}
+
+/* Authentic Continuous Paper Feed Perforations */
+.tape-paper-edge {
+  background-image: radial-gradient(#64748b 15%, transparent 16%);
+  background-size: 10px 10px;
+}
+
+/* UI Density / Scale presets */
+.ui-scale-compact {
+  font-size: 0.92rem;
+}
+.ui-scale-standard {
+  font-size: 1rem;
+}
+.ui-scale-expanded {
+  font-size: 1.08rem;
+}
+
+/* =========================================================================
+   Print Media Styles for Crisp Physical & PDF Output
+   ========================================================================= */
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #printable-report-area,
+  #printable-report-area * {
+    visibility: visible !important;
+  }
+
+  #printable-report-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .page-break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+

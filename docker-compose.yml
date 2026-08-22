@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  accountant-calculator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iooc-accountant-calculator
+    restart: unless-stopped
+    ports:
+      - "${PORT:-9330}:${PORT:-9330}"
+    environment:
+      - PORT=${PORT:-9330}
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:${PORT:-9330}/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

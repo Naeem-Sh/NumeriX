@@ -1,0 +1,6 @@
+{
+  "name": "NumeriX",
+  "description": "Desktop-grade accounting and financial calculator with tape history, customizable decimal precision, Excel/PDF export, analog clock, and logo personalization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
