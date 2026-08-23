@@ -29,6 +29,8 @@ interface KeypadProps {
   onGrandTotal: () => void;
   settings: CalculatorSettings;
   activeKeyId: string | null;
+  isNumLockOn?: boolean;
+  onToggleNumLock?: () => void;
 }
 
 export const Keypad: React.FC<KeypadProps> = ({
@@ -55,11 +57,13 @@ export const Keypad: React.FC<KeypadProps> = ({
   onGrandTotal,
   settings,
   activeKeyId,
+  isNumLockOn = true,
+  onToggleNumLock,
 }) => {
   const isLight = settings.theme === 'light';
 
   // Key style helpers with ultra-high contrast and tactile 3D sculpted keycaps
-  const btnBase = `relative flex items-center justify-center font-bold select-none active:scale-[0.97] rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/50 cursor-pointer fluid-keypad-btn ${
+  const btnBase = `relative flex items-center justify-center font-bold select-none active:scale-[0.97] rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/50 cursor-pointer fluid-keypad-btn transition-all ${
     isLight ? 'keycap-light-sculpted' : 'keycap-sculpted'
   }`;
 

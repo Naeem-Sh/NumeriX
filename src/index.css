@@ -22,14 +22,13 @@
   --fluid-btn-fn-size: clamp(0.7rem, 0.3vw + 0.55rem, 1.05rem);
   --fluid-btn-enter-size: clamp(1.1rem, 0.8vw + 0.75rem, 2.25rem);
 
-  /* 20-Line Paper Tape Dynamic Scaling */
-  --fluid-tape-min-h: clamp(260px, 35vh, 650px);
-  --fluid-tape-max-h: clamp(380px, 55vh, 900px);
-  --fluid-tape-result-size: clamp(1rem, 0.5vw + 0.8rem, 1.75rem);
-  --fluid-tape-exp-size: clamp(0.75rem, 0.3vw + 0.6rem, 1.1rem);
+  /* Paper Tape & Layout Proportions */
+  --fluid-tape-min-h: clamp(200px, 30vh, 600px);
+  --fluid-tape-result-size: clamp(0.95rem, 0.45vw + 0.75rem, 1.6rem);
+  --fluid-tape-exp-size: clamp(0.75rem, 0.25vw + 0.6rem, 1.05rem);
 
   /* Analog Clock Dial Size */
-  --fluid-clock-dial: clamp(40px, 1.8vw + 20px, 64px);
+  --fluid-clock-dial: clamp(38px, 1.6vw + 18px, 56px);
 }
 
 @layer base {
@@ -80,7 +79,6 @@
 
 .fluid-tape-container {
   min-height: var(--fluid-tape-min-h);
-  max-height: var(--fluid-tape-max-h);
 }
 
 .fluid-clock-dial-size {

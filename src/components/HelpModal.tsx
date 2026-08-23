@@ -1,6 +1,7 @@
 import React from 'react';
 import { CalculatorSettings } from '../types';
 import { X, Keyboard, Calculator, HelpCircle, FileSpreadsheet } from 'lucide-react';
+import { NumerixLogo } from './NumerixLogo';
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -27,9 +28,8 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose, settings 
             isLight ? 'border-slate-200 bg-slate-50' : 'border-slate-800 bg-slate-950/60'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-cyan-500" />
-            <h2 className="text-base font-bold tracking-tight">NumeriX User Guide & Keyboard Shortcuts</h2>
+          <div className="flex items-center gap-3">
+            <NumerixLogo size="sm" variant="horizontal" isLight={isLight} />
           </div>
           <button
             onClick={onClose}
@@ -48,6 +48,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose, settings 
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {[
+                { key: 'Num Lock', desc: 'Toggle hardware numeric keypad numbers (LED indicator on display & header)' },
                 { key: '0 – 9, . , 00', desc: 'Type numbers directly or via NumPad' },
                 { key: '+ , − , * , /', desc: 'Standard arithmetic operators' },
                 { key: 'Enter or =', desc: 'Execute calculation & record to tape' },

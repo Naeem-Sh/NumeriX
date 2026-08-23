@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { CalculationRecord, CalculatorSettings, PrintOptions } from '../types';
 import { formatAccountingNumber } from './numberFormat';
+import { NUMERIX_LOGO_DATA_URL, NUMERIX_EMBLEM_DATA_URL } from './numerixLogoAsset';
 
 export function generatePdfReport(
   records: CalculationRecord[],
@@ -39,15 +40,21 @@ export function generatePdfReport(
   let startY = margin;
 
   // 1. Draw Header & Logo
-  if (customOptions?.showLogo !== false && settings.logoDataUrl) {
+  const showAppLogo = customOptions?.showLogo !== false;
+  if (showAppLogo) {
     try {
-      doc.addImage(settings.logoDataUrl, 'PNG', margin, startY, 22, 22, undefined, 'FAST');
+      // Use official NumeriX logo
+      doc.addImage(NUMERIX_LOGO_DATA_URL, 'SVG', margin, startY - 2, 34, 20.4, undefined, 'FAST');
     } catch {
-      // If logo rendering fails, proceed gracefully
+      try {
+        doc.addImage(NUMERIX_EMBLEM_DATA_URL, 'SVG', margin, startY, 18, 18, undefined, 'FAST');
+      } catch {
+        // Proceed gracefully if SVG embedding is not available
+      }
     }
   }
 
-  const headerLeftOffset = (customOptions?.showLogo !== false && settings.logoDataUrl) ? margin + 26 : margin;
+  const headerLeftOffset = showAppLogo ? margin + 38 : margin;
 
   if (customOptions?.showCompanyHeader !== false) {
     // Company Name
@@ -90,15 +97,29 @@ export function generatePdfReport(
 
   // Watermark if requested
   if (customOptions?.watermark && customOptions.watermark !== 'NONE') {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(54);
-    doc.setTextColor(220, 226, 235);
     doc.saveGraphicsState();
-    // Centered diagonal watermark
-    doc.text(customOptions.watermark, pageWidth / 2, pageHeight / 2, {
-      align: 'center',
-      angle: isLandscape ? 30 : 45,
-    });
+    doc.setTextColor(220, 226, 235);
+
+    if (customOptions.watermark === 'NUMERIX_IOOC') {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(32);
+      doc.text('NUMERIX', pageWidth / 2, pageHeight / 2 - 8, {
+        align: 'center',
+        angle: isLandscape ? 30 : 45,
+      });
+      doc.setFontSize(22);
+      doc.text('IOOC - SHIRAZ OFFICE', pageWidth / 2, pageHeight / 2 + 8, {
+        align: 'center',
+        angle: isLandscape ? 30 : 45,
+      });
+    } else {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(54);
+      doc.text(customOptions.watermark, pageWidth / 2, pageHeight / 2, {
+        align: 'center',
+        angle: isLandscape ? 30 : 45,
+      });
+    }
     doc.restoreGraphicsState();
   }
 
@@ -165,7 +186,7 @@ export function generatePdfReport(
 
   const tableData = records.map((r, i) => {
     const row: string[] = [];
-    if (showLines) row.push((i + 1).toString());
+    if (showLines) row.push(String(i + 1).padStart(2, '0'));
     if (showTime) row.push(r.displayTime || '');
     row.push(r.expression || '');
     if (showOps) row.push(r.operationType ? r.operationType.toUpperCase().replace('_', ' ') : 'MATH');

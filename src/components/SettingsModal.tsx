@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { CalculatorSettings, AppTheme, NumberFormatType, DateFormatType, WorkspaceLayout } from '../types';
 import {
   X,
@@ -10,15 +10,12 @@ import {
   Building2,
   User,
   RotateCcw,
-  Upload,
-  Image as ImageIcon,
-  Trash2,
-  CheckCircle2,
-  Sparkles,
   PanelRight,
   PanelLeft,
   PanelTop,
   LayoutGrid,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import { playKeySound } from '../utils/audio';
 import { DEFAULT_SETTINGS } from '../utils/storage';
@@ -38,68 +35,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onUpdateSettings,
   onResetDefaults,
 }) => {
-  const [dragActive, setDragActive] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   if (!isOpen) return null;
 
   const isLight = settings.theme === 'light';
 
   const handleTestSound = () => {
     playKeySound('enter', settings.soundVolume);
-  };
-
-  const processFile = (file: File) => {
-    setUploadError(null);
-    setUploadSuccess(false);
-
-    if (!file.type.match(/image\/(png|jpeg|jpg|webp|svg\+xml|gif)/)) {
-      setUploadError('Please upload a valid image file (PNG, JPG, WEBP, SVG, or GIF).');
-      return;
-    }
-    if (file.size > 3 * 1024 * 1024) {
-      setUploadError('Image size should be under 3MB for fast browser loading.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string;
-      onUpdateSettings({ logoDataUrl: dataUrl });
-      setUploadSuccess(true);
-      setTimeout(() => setUploadSuccess(false), 3000);
-    };
-    reader.onerror = () => {
-      setUploadError('Failed to read image file. Please try another image.');
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      processFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleRemoveLogo = () => {
-    onUpdateSettings({ logoDataUrl: null });
-    setUploadError(null);
-    setUploadSuccess(false);
   };
 
   return (
@@ -641,137 +582,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
-          {/* 5. Home Page Logo & Organization Branding */}
-          <div className="space-y-3 pt-2 border-t border-slate-800/40">
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 font-bold">
-                <ImageIcon className="w-4 h-4 text-cyan-500" />
-                <span>Home Page Logo</span>
-              </label>
-              {settings.logoDataUrl && (
-                <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-400">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Active on Header
-                </span>
-              )}
-            </div>
-
-            <p className="text-xs text-slate-400">
-              Upload an image file (PNG, JPG, SVG, or WEBP) to set as the custom logo in the top-left of the home page header and on generated calculation reports.
-            </p>
-
-            {/* Drag & Drop / Upload Box */}
-            <div
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`relative flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed transition-all cursor-pointer ${
-                dragActive
-                  ? 'border-cyan-500 bg-cyan-500/10'
-                  : isLight
-                  ? 'border-slate-300 hover:border-slate-400 bg-slate-50/80 hover:bg-slate-100/80'
-                  : 'border-slate-700 hover:border-slate-600 bg-slate-950/40 hover:bg-slate-950/70'
-              }`}
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/gif"
-                onChange={(e) => e.target.files?.[0] && processFile(e.target.files[0])}
-                className="hidden"
-              />
-
-              <div className="w-10 h-10 rounded-full border border-cyan-500/30 bg-cyan-950/40 flex items-center justify-center mb-2 text-cyan-400">
-                <Upload className="w-5 h-5" />
-              </div>
-
-              <p className="font-semibold text-xs text-center">
-                Click to browse or Drag & Drop image file here
-              </p>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Supports PNG, JPG, SVG, WEBP (Max 3MB)
-              </p>
-            </div>
-
-            {uploadError && (
-              <p className="text-xs text-rose-500 font-medium">{uploadError}</p>
-            )}
-
-            {uploadSuccess && (
-              <p className="text-xs text-emerald-400 font-medium flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Logo uploaded and applied to home page successfully!
-              </p>
-            )}
-
-            {/* Active Logo Preview Card */}
-            {settings.logoDataUrl ? (
-              <div
-                className={`flex items-center justify-between p-3.5 rounded-xl border ${
-                  isLight ? 'bg-slate-100 border-slate-200' : 'bg-slate-800/60 border-slate-700'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-lg bg-white/95 p-1.5 flex items-center justify-center border border-slate-300 overflow-hidden shadow-xs shrink-0">
-                    <img
-                      src={settings.logoDataUrl}
-                      alt="Home Page Logo Preview"
-                      className="max-w-full max-h-full object-contain"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-bold text-xs">Current Home Page Logo</p>
-                    <p className="text-[11px] text-slate-400">
-                      Displayed on top navigation bar and audit reports
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      fileInputRef.current?.click();
-                    }}
-                    className={`px-2.5 py-1 rounded-lg border text-xs font-semibold cursor-pointer ${
-                      isLight
-                        ? 'bg-white hover:bg-slate-200 border-slate-300 text-slate-800'
-                        : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-100'
-                    }`}
-                  >
-                    Change
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveLogo();
-                    }}
-                    title="Remove custom logo and use default"
-                    className="p-1.5 rounded-lg border border-rose-800/80 text-rose-400 hover:bg-rose-950/50 transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-dashed border-slate-700/60 bg-slate-800/20 text-xs text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Default financial icon is currently in use
-                </span>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-cyan-400 hover:underline font-medium text-xs cursor-pointer"
-                >
-                  Upload custom logo
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* 6. Organization & Report Metadata */}
+          {/* Organization & Operator Metadata */}
           <div className="space-y-3 pt-2 border-t border-slate-800/40">
             <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">
               Report & Organization Header

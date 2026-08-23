@@ -53,7 +53,7 @@ export type PrintPaperSize = 'A4' | 'Letter' | 'Legal' | 'Receipt';
 export type PrintOrientation = 'portrait' | 'landscape';
 export type PrintColorMode = 'color' | 'grayscale' | 'ink_saver';
 export type PrintDensity = 'compact' | 'standard' | 'spacious';
-export type PrintWatermark = 'NONE' | 'CONFIDENTIAL' | 'DRAFT' | 'AUDITED' | 'APPROVED' | 'COPY';
+export type PrintWatermark = 'NONE' | 'NUMERIX_IOOC' | 'CONFIDENTIAL' | 'DRAFT' | 'AUDITED' | 'APPROVED' | 'COPY';
 
 export interface PrintOptions {
   paperSize: PrintPaperSize;

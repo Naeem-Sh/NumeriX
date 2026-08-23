@@ -19,6 +19,8 @@ interface CalculatorDisplayProps {
   onDecIncrease: () => void;
   onDecDecrease: () => void;
   onDirectDecSet: (dec: number) => void;
+  isNumLockOn?: boolean;
+  onToggleNumLock?: () => void;
 }
 
 export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
@@ -36,6 +38,8 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
   onDecIncrease,
   onDecDecrease,
   onDirectDecSet,
+  isNumLockOn = true,
+  onToggleNumLock,
 }) => {
   const [copiedType, setCopiedType] = useState<'formatted' | 'raw' | null>(null);
   const [copiedPreview, setCopiedPreview] = useState<string>('');
@@ -182,6 +186,37 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
           >
             TAX: {settings.taxRate}%
           </span>
+
+          {/* Num Lock Status LED Badge */}
+          <button
+            type="button"
+            id="calculator-display-numlock-badge"
+            onClick={onToggleNumLock}
+            title={`Physical Keyboard Num Lock: ${
+              isNumLockOn ? 'ON (Numpad input active)' : 'OFF (Numpad input disabled / navigation mode)'
+            }. Press Num Lock on your keyboard or click here to toggle.`}
+            className={`flex items-center gap-1.5 px-2 py-0.5 rounded font-mono text-[10px] sm:text-[11px] font-black border transition-all cursor-pointer select-none ${
+              isNumLockOn
+                ? isLight
+                  ? 'bg-emerald-100 border-emerald-400 text-emerald-950 shadow-xs hover:bg-emerald-200'
+                  : 'bg-emerald-950/70 border-emerald-500/80 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.2)] hover:bg-emerald-900/80'
+                : isLight
+                  ? 'bg-amber-100 border-amber-400 text-amber-950 shadow-xs animate-pulse hover:bg-amber-200'
+                  : 'bg-amber-950/70 border-amber-500/80 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse hover:bg-amber-900/80'
+            }`}
+          >
+            {/* Glowing Hardware-Style LED Lamp */}
+            <span
+              className={`w-2 h-2 rounded-full transition-all shrink-0 ${
+                isNumLockOn
+                  ? 'bg-emerald-500 shadow-[0_0_7px_#10b981] ring-1 ring-emerald-400'
+                  : 'bg-amber-500 shadow-[0_0_7px_#f59e0b] ring-1 ring-amber-400'
+              }`}
+            />
+            <span className="tracking-tight uppercase">
+              NUM {isNumLockOn ? 'ON' : 'OFF'}
+            </span>
+          </button>
         </div>
 
         {/* Right: Decimal Controls (DEC - / DEC +) */}

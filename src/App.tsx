@@ -28,6 +28,7 @@ import { Keypad } from './components/Keypad';
 import { SettingsModal } from './components/SettingsModal';
 import { HelpModal } from './components/HelpModal';
 import { PrintPreviewModal } from './components/PrintPreviewModal';
+import { NumerixLogo } from './components/NumerixLogo';
 
 import {
   Settings as SettingsIcon,
@@ -41,6 +42,7 @@ import {
   PanelTop,
   LayoutGrid,
   FileSpreadsheet,
+  FileText,
 } from 'lucide-react';
 
 interface CalcStateSnapshot {
@@ -97,6 +99,9 @@ export default function App() {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
   const [pasteToast, setPasteToast] = useState<{ show: boolean; count: number; sum: number } | null>(null);
+
+  // Num Lock Detection & Live Status
+  const [isNumLockOn, setIsNumLockOn] = useState<boolean>(true);
 
   // Reference for active key flash timeout
   const keyFlashTimeout = useRef<number | null>(null);
@@ -658,6 +663,12 @@ export default function App() {
     triggerKeyFeedback('reset_defaults', 'action');
   }, [triggerKeyFeedback]);
 
+  // Num Lock manual toggle
+  const handleToggleNumLock = useCallback(() => {
+    setIsNumLockOn((prev) => !prev);
+    triggerKeyFeedback('numlock', 'action');
+  }, [triggerKeyFeedback]);
+
   // Auto-Tally numbers from Excel / Clipboard with Intelligent Parsing
   const handleAutoTallyFromText = useCallback(
     (text: string) => {
@@ -717,9 +728,35 @@ export default function App() {
     [result, settings, triggerKeyFeedback, pushStateSnapshot]
   );
 
-  // Global Keyboard & Paste Listener
+  // Global Keyboard & Interaction Listener with Real-Time Physical Keyboard Num Lock Detection
   useEffect(() => {
+    const syncPhysicalNumLock = (e: KeyboardEvent | MouseEvent | PointerEvent | FocusEvent) => {
+      if ('getModifierState' in e && typeof (e as KeyboardEvent).getModifierState === 'function') {
+        const physicalState = (e as KeyboardEvent).getModifierState('NumLock');
+        setIsNumLockOn(physicalState);
+      }
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
+      syncPhysicalNumLock(e);
+
+      // Dedicated NumLock key press
+      if (e.key === 'NumLock') {
+        const physicalState = typeof e.getModifierState === 'function' ? e.getModifierState('NumLock') : undefined;
+        setIsNumLockOn((prev) => (physicalState !== undefined ? physicalState : !prev));
+        triggerKeyFeedback('numlock', 'action');
+        return;
+      }
+
+      // Check if numpad navigation key was pressed while NumLock is off
+      if (e.code && e.code.startsWith('Numpad')) {
+        if (['Insert', 'End', 'ArrowDown', 'PageDown', 'ArrowLeft', 'Clear', 'ArrowRight', 'Home', 'ArrowUp', 'PageUp', 'Delete'].includes(e.key)) {
+          setIsNumLockOn(false);
+        } else if (/^[0-9]$/.test(e.key) || e.key === '.') {
+          setIsNumLockOn(true);
+        }
+      }
+
       // Don't capture when typing inside an open modal input
       if (
         document.activeElement?.tagName === 'INPUT' ||
@@ -934,10 +971,40 @@ export default function App() {
       }
     };
 
+    const handleKeyUp = (e: KeyboardEvent) => {
+      syncPhysicalNumLock(e);
+      if (e.key === 'NumLock') {
+        const physicalState = typeof e.getModifierState === 'function' ? e.getModifierState('NumLock') : undefined;
+        if (physicalState !== undefined) {
+          setIsNumLockOn(physicalState);
+        }
+      }
+    };
+
+    const handlePointerDown = (e: MouseEvent) => {
+      syncPhysicalNumLock(e);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      syncPhysicalNumLock(e);
+    };
+
+    const handleWindowFocus = () => {
+      // Re-verify on window focus if possible
+    };
+
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('focus', handleWindowFocus);
     window.addEventListener('paste', handlePaste);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('focus', handleWindowFocus);
       window.removeEventListener('paste', handlePaste);
     };
   }, [
@@ -967,6 +1034,7 @@ export default function App() {
     handleRedo,
     handleOpenPrintPreview,
     handleAutoTallyFromText,
+    triggerKeyFeedback,
   ]);
 
   // 2-State Sound Switcher: On / Off Toggle (in On mode, sound effect plays only on Enter key)
@@ -1006,48 +1074,54 @@ export default function App() {
         }`}
       >
         <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-3">
-          {/* Logo & Application Title */}
+          {/* Official NumeriX App Logo & Title */}
           <div className="flex items-center gap-3">
             <button
               id="header-logo-btn"
-              onClick={() => setIsSettingsOpen(true)}
-              title="Click to open settings & customize company logo"
-              className="relative group w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center p-1 border border-cyan-500/30 bg-cyan-950/30 hover:border-cyan-400 transition-all cursor-pointer shadow-xs overflow-hidden shrink-0"
+              onClick={() => setIsHelpOpen(true)}
+              title="NumeriX Online Calculator - Click for Quick Guide & Shortcuts"
+              className="flex items-center gap-3 hover:opacity-90 transition-opacity cursor-pointer text-left"
             >
-              {settings.logoDataUrl ? (
-                <img
-                  src={settings.logoDataUrl}
-                  alt="Company Logo"
-                  className="max-w-full max-h-full object-contain"
-                />
-              ) : (
-                <CalcIcon className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-cyan-400 group-hover:scale-110 transition-transform" />
-              )}
+              <NumerixLogo size="sm" variant="horizontal" isLight={isLight} />
             </button>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm sm:text-base xl:text-lg font-black tracking-tight leading-tight flex items-center gap-1.5">
-                  <span className={`font-black tracking-wide ${isLight ? 'text-cyan-800' : 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300'}`}>
-                    NumeriX
-                  </span>
-                  {settings.companyName && (
-                    <span className={`font-medium text-xs sm:text-sm ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>
-                      • {settings.companyName}
-                    </span>
-                  )}
-                </h1>
-                <span className={`hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                  isLight ? 'bg-cyan-100 text-cyan-900 border border-cyan-300' : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                }`}>
-                  Financial Pro
-                </span>
-              </div>
-            </div>
+            <span className={`hidden md:inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+              isLight ? 'bg-cyan-100 text-cyan-900 border border-cyan-300' : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+            }`}>
+              Financial Pro
+            </span>
           </div>
 
           {/* Right Header: Clean Essential Tools */}
           <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Num Lock Status Quick Indicator */}
+            <button
+              id="header-numlock-btn"
+              onClick={handleToggleNumLock}
+              title={`Physical Keyboard Num Lock: ${
+                isNumLockOn ? 'ON (Active)' : 'OFF (Arrow/Navigation Mode)'
+              }. Press NumLock key on keyboard or click to toggle.`}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
+                isNumLockOn
+                  ? isLight
+                    ? 'bg-emerald-100 hover:bg-emerald-200 border-emerald-300 text-emerald-950 shadow-xs'
+                    : 'bg-emerald-950/60 hover:bg-emerald-900/80 border-emerald-700 text-emerald-300 shadow-xs'
+                  : isLight
+                  ? 'bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-950 shadow-xs animate-pulse'
+                  : 'bg-amber-950/60 hover:bg-amber-900/80 border-amber-700 text-amber-300 shadow-xs animate-pulse'
+              }`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full transition-all shrink-0 ${
+                  isNumLockOn
+                    ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]'
+                    : 'bg-amber-500 shadow-[0_0_6px_#f59e0b]'
+                }`}
+              />
+              <span className="text-[11px] font-mono">
+                NUM: {isNumLockOn ? 'ON' : 'OFF'}
+              </span>
+            </button>
+
             {/* 2-Option Sound Toggle: Sound ON / OFF (Enter key only when ON) */}
             <button
               id="header-sound-toggle-btn"
@@ -1080,20 +1154,19 @@ export default function App() {
               )}
             </button>
 
-            {/* Export to Excel Quick Header Button */}
+            {/* Quick PDF Report & Print Preview Button */}
             <button
-              id="header-export-excel-btn"
-              onClick={handleExportExcel}
-              disabled={tapeRecords.length === 0}
-              title="Export calculation audit tape to Microsoft Excel (.XLSX) - (Ctrl+E)"
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed ${
+              id="header-pdf-btn"
+              onClick={handleOpenPrintPreview}
+              title="Export calculation tape to PDF / Print Report (Ctrl+P)"
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
                 isLight
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-700 shadow-xs'
-                  : 'bg-emerald-700/90 hover:bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                  ? 'bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-800 shadow-xs'
+                  : 'bg-rose-950/60 hover:bg-rose-900/80 border-rose-800 text-rose-300 shadow-xs'
               }`}
             >
-              <FileSpreadsheet className="w-4 h-4 text-white" />
-              <span className="text-[11px] hidden sm:inline">Excel</span>
+              <FileText className="w-4 h-4 text-rose-500" />
+              <span className="text-[11px]">PDF</span>
             </button>
 
             {/* Settings Button */}
@@ -1149,12 +1222,12 @@ export default function App() {
       )}
 
       {/* 2. Main Workstation Area */}
-      <main className="flex-1 min-h-0 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex flex-col justify-center">
+      <main className="flex-1 min-h-0 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto px-3 sm:px-5 lg:px-7 py-2 sm:py-2.5 flex flex-col justify-center">
         {currentLayout === 'audit-left' ? (
-          /* Mode 2: Audit Left & Keypad Right */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 lg:gap-5 2xl:gap-6 items-stretch h-full min-h-0">
+          /* Mode 2: Audit Left & Keypad Right (Accounting Standard) */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-stretch h-full min-h-0">
             {/* Left Column: Paper Tape / Calculation Audit History (5 Cols) */}
-            <section className="lg:col-span-5 h-[340px] sm:h-[400px] lg:h-full min-h-0 flex flex-col order-1">
+            <section className="lg:col-span-5 h-[360px] sm:h-[420px] lg:h-full min-h-0 flex flex-col order-1">
               <TapeHistory
                 records={tapeRecords}
                 settings={settings}
@@ -1185,6 +1258,8 @@ export default function App() {
                 onDecIncrease={handleDecIncrease}
                 onDecDecrease={handleDecDecrease}
                 onDirectDecSet={handleDirectDecSet}
+                isNumLockOn={isNumLockOn}
+                onToggleNumLock={handleToggleNumLock}
               />
 
               <div
@@ -1218,15 +1293,17 @@ export default function App() {
                   onGrandTotal={handleGrandTotal}
                   settings={settings}
                   activeKeyId={activeKeyId}
+                  isNumLockOn={isNumLockOn}
+                  onToggleNumLock={handleToggleNumLock}
                 />
               </div>
             </section>
           </div>
         ) : currentLayout === 'audit-top' ? (
           /* Mode 3: Audit Up & Keypad Down (Vertical Stacked Layout) */
-          <div className="flex flex-col gap-3 lg:gap-4 items-stretch h-full min-h-0 max-w-4xl mx-auto w-full overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+          <div className="flex flex-col gap-3 lg:gap-3.5 items-stretch h-full min-h-0 max-w-2xl sm:max-w-3xl lg:max-w-3xl xl:max-w-4xl mx-auto w-full overflow-y-auto pr-0.5" style={{ scrollbarWidth: 'thin' }}>
             {/* Top Area: Paper Tape / Calculation Audit History */}
-            <section className="h-[280px] sm:h-[320px] lg:h-[350px] shrink-0 flex flex-col">
+            <section className="h-[250px] sm:h-[280px] lg:h-[300px] shrink-0 flex flex-col">
               <TapeHistory
                 records={tapeRecords}
                 settings={settings}
@@ -1241,7 +1318,7 @@ export default function App() {
             </section>
 
             {/* Bottom Area: Calculator Display, Decimal Controls & Keypad */}
-            <section className="flex flex-col gap-2 sm:gap-2.5 lg:gap-3 shrink-0">
+            <section className="flex flex-col gap-2 sm:gap-2.5 shrink-0">
               <CalculatorDisplay
                 expression={expression}
                 currentInput={currentInput}
@@ -1257,6 +1334,8 @@ export default function App() {
                 onDecIncrease={handleDecIncrease}
                 onDecDecrease={handleDecDecrease}
                 onDirectDecSet={handleDirectDecSet}
+                isNumLockOn={isNumLockOn}
+                onToggleNumLock={handleToggleNumLock}
               />
 
               <div
@@ -1290,13 +1369,15 @@ export default function App() {
                   onGrandTotal={handleGrandTotal}
                   settings={settings}
                   activeKeyId={activeKeyId}
+                  isNumLockOn={isNumLockOn}
+                  onToggleNumLock={handleToggleNumLock}
                 />
               </div>
             </section>
           </div>
         ) : (
-          /* Mode 1 (DEFAULT): Audit Right & Keypad Left (Optimized for 16:9 widescreen monitors) */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 lg:gap-5 2xl:gap-6 items-stretch h-full min-h-0">
+          /* Mode 1 (DEFAULT): Audit Right & Keypad Left (Widescreen Optimized) */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-stretch h-full min-h-0">
             {/* Left Column: Calculator Display, Decimal Controls & Keypad (7 Cols) */}
             <section className="lg:col-span-7 flex flex-col justify-between gap-2 sm:gap-2.5 lg:gap-3 h-full min-h-0 order-1">
               <CalculatorDisplay
@@ -1314,6 +1395,8 @@ export default function App() {
                 onDecIncrease={handleDecIncrease}
                 onDecDecrease={handleDecDecrease}
                 onDirectDecSet={handleDirectDecSet}
+                isNumLockOn={isNumLockOn}
+                onToggleNumLock={handleToggleNumLock}
               />
 
               <div
@@ -1347,12 +1430,14 @@ export default function App() {
                   onGrandTotal={handleGrandTotal}
                   settings={settings}
                   activeKeyId={activeKeyId}
+                  isNumLockOn={isNumLockOn}
+                  onToggleNumLock={handleToggleNumLock}
                 />
               </div>
             </section>
 
             {/* Right Column: Paper Tape / Calculation Audit History (5 Cols) */}
-            <section className="lg:col-span-5 h-[340px] sm:h-[400px] lg:h-full min-h-0 flex flex-col order-2">
+            <section className="lg:col-span-5 h-[360px] sm:h-[420px] lg:h-full min-h-0 flex flex-col order-2">
               <TapeHistory
                 records={tapeRecords}
                 settings={settings}
@@ -1451,8 +1536,36 @@ export default function App() {
         }`}
       >
         <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex items-center justify-between text-[11px] sm:text-xs">
-          <div className="font-bold tracking-wider uppercase opacity-90">
-            IOOC-ShirazOffice
+          <div className="flex items-center gap-2.5 font-bold tracking-wider uppercase opacity-90">
+            <span>IOOC-ShirazOffice</span>
+            <span className="opacity-30">|</span>
+            {/* Real physical keyboard Num Lock status badge at bottom */}
+            <button
+              type="button"
+              id="footer-numlock-status-btn"
+              onClick={handleToggleNumLock}
+              title={`Physical Keyboard NumLock Status: ${
+                isNumLockOn ? 'ON (Numpad Digits Active)' : 'OFF (Arrow & Navigation Mode)'
+              }. Click to toggle or press NumLock key on your keyboard.`}
+              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors cursor-pointer ${
+                isNumLockOn
+                  ? isLight
+                    ? 'bg-emerald-100 text-emerald-950 border-emerald-300 shadow-xs hover:bg-emerald-200'
+                    : 'bg-emerald-950/60 text-emerald-300 border-emerald-700 shadow-xs hover:bg-emerald-900/80'
+                  : isLight
+                  ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs animate-pulse hover:bg-amber-200'
+                  : 'bg-amber-950/60 text-amber-300 border-amber-700 shadow-xs animate-pulse hover:bg-amber-900/80'
+              }`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full transition-all shrink-0 ${
+                  isNumLockOn
+                    ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]'
+                    : 'bg-amber-500 shadow-[0_0_6px_#f59e0b]'
+                }`}
+              />
+              <span>NUM LOCK: {isNumLockOn ? 'ON' : 'OFF'}</span>
+            </button>
           </div>
           <div className="font-medium opacity-75">
             By: N.Shaaeri

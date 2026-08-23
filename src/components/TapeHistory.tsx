@@ -50,6 +50,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
   const [tempNote, setTempNote] = useState<string>('');
   const noteInputRef = useRef<HTMLInputElement>(null);
   const tapeContainerRef = useRef<HTMLDivElement>(null);
+  const bottomAnchorRef = useRef<HTMLDivElement>(null);
   const clearConfirmTimeoutRef = useRef<number | null>(null);
   const prevCountRef = useRef(records.length);
   const prevLastIdRef = useRef(records[records.length - 1]?.id);
@@ -98,55 +99,65 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
     }
   };
 
-  // High-reliability container auto-scroll ensuring the newest calculation record is always fully visible
+  // High-reliability container auto-scroll animation ensuring the newest calculation record is always fully visible
   const scrollToBottom = useCallback((instant = false) => {
-    const el = tapeContainerRef.current;
-    if (!el) return;
+    const container = tapeContainerRef.current;
+    if (!container) return;
 
-    const performScroll = () => {
+    const performScroll = (behavior: ScrollBehavior = 'smooth') => {
       if (!tapeContainerRef.current) return;
-      const targetScroll = tapeContainerRef.current.scrollHeight;
-      if (instant) {
-        tapeContainerRef.current.scrollTop = targetScroll;
-      } else {
-        tapeContainerRef.current.scrollTo({
-          top: targetScroll,
-          behavior: 'smooth',
+      
+      // 1. Scroll container directly to scrollHeight
+      tapeContainerRef.current.scrollTo({
+        top: tapeContainerRef.current.scrollHeight,
+        behavior,
+      });
+
+      // 2. Also ensure bottom anchor element is scrolled into view
+      if (bottomAnchorRef.current) {
+        bottomAnchorRef.current.scrollIntoView({
+          behavior,
+          block: 'end',
+          inline: 'nearest',
         });
       }
     };
 
-    // 1. Immediate scroll attempt
-    performScroll();
+    if (instant) {
+      performScroll('auto');
+    } else {
+      // Immediate smooth scroll
+      performScroll('smooth');
 
-    // 2. Next animation frames
-    requestAnimationFrame(() => {
-      performScroll();
-      requestAnimationFrame(performScroll);
-    });
+      // Request animation frame passes for render pipeline
+      requestAnimationFrame(() => {
+        performScroll('smooth');
+        requestAnimationFrame(() => performScroll('smooth'));
+      });
 
-    // 3. Staggered timers for DOM layout & Framer Motion entrance completion
-    setTimeout(performScroll, 40);
-    setTimeout(performScroll, 120);
-    setTimeout(() => {
-      if (tapeContainerRef.current) {
-        tapeContainerRef.current.scrollTop = tapeContainerRef.current.scrollHeight;
-      }
-    }, 250);
+      // Timed passes to account for Framer Motion item entry expansions
+      setTimeout(() => performScroll('smooth'), 50);
+      setTimeout(() => performScroll('smooth'), 150);
+      setTimeout(() => {
+        if (tapeContainerRef.current) {
+          tapeContainerRef.current.scrollTop = tapeContainerRef.current.scrollHeight;
+        }
+      }, 280);
+    }
   }, []);
 
   // Monitor scroll position to show jump-to-bottom indicator when user scrolls up
   const handleScroll = useCallback(() => {
     if (!tapeContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = tapeContainerRef.current;
-    const atBottom = scrollHeight - scrollTop - clientHeight < 50;
+    const atBottom = scrollHeight - scrollTop - clientHeight < 60;
     setIsNearBottom(atBottom);
   }, []);
 
-  // Trigger auto-scroll on new calculation record additions
+  // Trigger auto-scroll animation whenever a new calculation record is added
   useEffect(() => {
     const currentLastId = records[records.length - 1]?.id;
-    const isNewRecordAdded = records.length > prevCountRef.current || currentLastId !== prevLastIdRef.current;
+    const isNewRecordAdded = records.length > prevCountRef.current || (records.length > 0 && currentLastId !== prevLastIdRef.current);
 
     prevCountRef.current = records.length;
     prevLastIdRef.current = currentLastId;
@@ -192,7 +203,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
       content = records
         .map(
           (r, idx) =>
-            `[#${idx + 1}] ${r.displayTime} | ${r.expression} = ${
+            `[#${String(idx + 1).padStart(2, '0')}] ${r.displayTime} | ${r.expression} = ${
               r.formattedResult || formatAccountingNumber(r.result, r.decimalPlaces, settings.numberFormat)
             }`
         )
@@ -397,7 +408,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
                       <div className="flex items-center justify-between gap-2 w-full">
                         {/* Time, Sentence/Expression, Note */}
                         <div className="flex items-center gap-1.5 truncate min-w-0 flex-1">
-                          <span className={`text-[10px] font-mono font-black shrink-0 ${isLight ? 'text-cyan-700' : 'text-cyan-400'}`}>#{index + 1}</span>
+                          <span className={`text-[10px] font-mono font-black shrink-0 ${isLight ? 'text-cyan-700' : 'text-cyan-400'}`}>#{String(index + 1).padStart(2, '0')}</span>
                           <span className={`font-mono text-[9px] px-1 py-0.2 rounded border shrink-0 ${isLight ? 'bg-slate-100 border-slate-250 text-slate-600' : 'bg-slate-900 border-slate-800 text-slate-400'}`}>
                             {rec.displayTime}
                           </span>
@@ -511,7 +522,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
                       <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
                         {/* 1. Index Number (Cyan / Steel) */}
                         <span className={`text-[11px] font-mono font-black shrink-0 ${isLight ? 'text-cyan-700' : 'text-cyan-400'}`}>
-                          #{index + 1}
+                          #{String(index + 1).padStart(2, '0')}
                         </span>
 
                         {/* 2. Timestamp (Color-coded Slate/Indigo Badge) */}
@@ -688,7 +699,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
             </AnimatePresence>
           )}
           {/* Bottom Anchor target for precise auto-scrolling */}
-          <div id="tape-bottom-anchor" className="h-3 w-full shrink-0" aria-hidden="true" />
+          <div ref={bottomAnchorRef} id="tape-bottom-anchor" className="h-4 w-full shrink-0 pointer-events-none" aria-hidden="true" />
         </div>
 
         {/* Floating "Scroll to Latest" Button when scrolled away from bottom */}

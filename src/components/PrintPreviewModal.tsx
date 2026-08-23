@@ -20,6 +20,7 @@ import {
 import { CalculationRecord, CalculatorSettings, PrintOptions, PrintPaperSize, PrintOrientation, PrintColorMode, PrintDensity, PrintWatermark } from '../types';
 import { formatAccountingNumber } from '../utils/numberFormat';
 import { generatePdfReport } from '../utils/pdfReport';
+import { NumerixLogo } from './NumerixLogo';
 
 interface PrintPreviewModalProps {
   isOpen: boolean;
@@ -401,22 +402,23 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Watermark Selector */}
-                  <div>
-                    <label className="block text-slate-300 font-semibold mb-1.5">Watermark Stamp</label>
-                    <select
-                      value={options.watermark}
-                      onChange={(e) => setOptions({ ...options, watermark: e.target.value as PrintWatermark })}
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
-                    >
-                      <option value="NONE">None (Clean Background)</option>
-                      <option value="CONFIDENTIAL">CONFIDENTIAL</option>
-                      <option value="DRAFT">DRAFT</option>
-                      <option value="AUDITED">AUDITED</option>
-                      <option value="APPROVED">APPROVED</option>
-                      <option value="COPY">COPY</option>
-                    </select>
-                  </div>
+                    {/* Watermark Selector */}
+                    <div>
+                      <label className="block text-slate-300 font-semibold mb-1.5">Watermark Stamp</label>
+                      <select
+                        value={options.watermark}
+                        onChange={(e) => setOptions({ ...options, watermark: e.target.value as PrintWatermark })}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
+                      >
+                        <option value="NONE">None (Clean Background)</option>
+                        <option value="NUMERIX_IOOC">NumeriX logo + IOOC-ShirazOffice</option>
+                        <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+                        <option value="DRAFT">DRAFT</option>
+                        <option value="AUDITED">AUDITED</option>
+                        <option value="APPROVED">APPROVED</option>
+                        <option value="COPY">COPY</option>
+                      </select>
+                    </div>
                 </div>
               )}
 
@@ -677,9 +679,18 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                   {/* Watermark Overlay */}
                   {options.watermark !== 'NONE' && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
-                      <div className="text-slate-200/50 font-black text-6xl md:text-8xl transform -rotate-30 tracking-widest uppercase border-4 border-slate-200/40 px-8 py-3 rounded-3xl">
-                        {options.watermark}
-                      </div>
+                      {options.watermark === 'NUMERIX_IOOC' ? (
+                        <div className="flex flex-col items-center justify-center gap-2 transform -rotate-30 border-4 border-slate-300/40 px-10 py-5 rounded-3xl opacity-40">
+                          <NumerixLogo size="lg" variant="icon" isLight={true} />
+                          <span className="text-slate-500 font-black text-2xl md:text-3xl tracking-widest uppercase text-center font-sans">
+                            NUMERIX • IOOC-SHIRAZ OFFICE
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="text-slate-200/50 font-black text-6xl md:text-8xl transform -rotate-30 tracking-widest uppercase border-4 border-slate-200/40 px-8 py-3 rounded-3xl">
+                          {options.watermark}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -688,13 +699,10 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                     {options.showCompanyHeader && (
                       <div className="flex items-start justify-between border-b-2 border-slate-800 pb-4 mb-4">
                         <div className="flex items-center gap-3">
-                          {options.showLogo && settings.logoDataUrl && (
-                            <img
-                              src={settings.logoDataUrl}
-                              alt="Logo"
-                              referrerPolicy="no-referrer"
-                              className="w-12 h-12 object-contain rounded border border-slate-200 p-0.5"
-                            />
+                          {options.showLogo && (
+                            <div className="shrink-0">
+                              <NumerixLogo size="sm" variant="horizontal" isLight={true} />
+                            </div>
                           )}
                           <div>
                             <h1 className="text-base font-bold text-slate-900 tracking-tight leading-tight">
@@ -800,8 +808,8 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                                 } ${fontSize}`}
                               >
                                 {options.showLineNumbers && (
-                                  <td className={`${paddingY} px-2 text-center text-slate-500 font-sans text-[10px]`}>
-                                    {index + 1}
+                                  <td className={`${paddingY} px-2 text-center text-slate-500 font-mono text-[10px]`}>
+                                    {String(index + 1).padStart(2, '0')}
                                   </td>
                                 )}
                                 {options.showTimestamps && (
