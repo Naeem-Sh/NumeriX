@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/Logo.png" alt="Project Logo" width="180">
+</p>
+
 # Professional Accountant Calculator
 
 A high-precision, desktop-grade financial and accounting calculator application tailored for accountants, auditors, and office professionals. Designed for speed, keyboard ergonomics, precision numeric handling, 20-line tape audit history, Excel `.xlsx` and PDF report generation, analog clock, and custom organization branding.
