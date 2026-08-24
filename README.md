@@ -165,6 +165,6 @@ docker compose up -d --build
 
 ## 🏢 Organization & Credits
 
-- **Organization**: IOOC-ShirazOffice
+- **Organization**: ShirazOffice
 - **Developer / Author**: By: N.Shaaeri
 - **License**: Proprietary / Office Enterprise
