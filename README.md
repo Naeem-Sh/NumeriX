@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo+.png" alt="Project Logo" width="180">
+  <img src="./assets/logo+.png" alt="Project Logo" width="200">
 </p>
 
 # Professional Accountant Calculator
