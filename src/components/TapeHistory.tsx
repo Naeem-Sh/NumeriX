@@ -220,23 +220,23 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
       id="tape-history-panel"
       className={`flex flex-col h-full rounded-2xl border transition-colors ${
         isLight
-          ? 'bg-slate-50 border-slate-300 text-slate-900 shadow-sm'
+          ? 'bg-[#dedbd2] border-stone-300 text-stone-900 shadow-xs'
           : 'bg-slate-900/90 border-slate-800 text-slate-100 shadow-md'
       }`}
     >
       {/* Tape Header & Controls */}
       <div
         className={`flex flex-wrap items-center justify-between gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 border-b text-xs font-medium ${
-          isLight ? 'border-slate-300 bg-white' : 'border-slate-800/80 bg-slate-950/40'
+          isLight ? 'border-stone-300 bg-[#d3cfc4]' : 'border-slate-800/80 bg-slate-950/40'
         }`}
       >
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 font-extrabold tracking-wider uppercase">
             <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className={isLight ? 'text-slate-900' : 'text-slate-100'}>Audit Tape</span>
+            <span className={isLight ? 'text-stone-900' : 'text-slate-100'}>Audit Tape</span>
             <span
               className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold ${
-                isLight ? 'bg-slate-200 text-slate-900 border border-slate-300' : 'bg-slate-800 text-slate-300'
+                isLight ? 'bg-stone-200 text-stone-900 border border-stone-300' : 'bg-slate-800 text-slate-300'
               }`}
             >
               {records.length} {records.length === 1 ? 'line' : 'lines'}
@@ -398,8 +398,8 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
                       className={`group flex flex-col px-2 py-1.5 rounded-md border text-xs transition-all cursor-pointer ${
                         isLight
                           ? isLatest
-                            ? 'bg-cyan-50/90 border-2 border-cyan-400 text-slate-950 font-bold shadow-2xs'
-                            : 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-900'
+                            ? 'bg-amber-100/90 border-2 border-amber-500 text-stone-950 font-bold shadow-2xs'
+                            : 'bg-[#f5f3ef] hover:bg-[#eae6df] border border-stone-300 text-stone-900'
                           : isLatest
                           ? 'bg-cyan-950/30 border-cyan-700 text-cyan-200 font-bold'
                           : 'bg-slate-950/50 hover:bg-slate-900/60 border-slate-800/80 text-slate-200'
@@ -509,8 +509,8 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
                     className={`group relative flex flex-col px-3 py-2 xl:py-2.5 rounded-xl border transition-all cursor-pointer ${
                       isLight
                         ? isLatest
-                          ? 'bg-cyan-50/90 border-2 border-cyan-400 text-slate-950 shadow-xs'
-                          : 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 shadow-2xs'
+                          ? 'bg-amber-100/90 border-2 border-amber-500 text-stone-950 shadow-xs'
+                          : 'bg-[#f5f3ef] hover:bg-[#eae6df] border border-stone-300 text-stone-900 shadow-2xs'
                         : isLatest
                         ? 'bg-cyan-950/30 border-cyan-750 text-slate-100 shadow-xs'
                         : 'bg-slate-950/50 hover:bg-slate-900/60 border-slate-800/80 text-slate-200'

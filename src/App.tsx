@@ -39,10 +39,11 @@ import {
   ClipboardCheck,
   PanelRight,
   PanelLeft,
-  PanelTop,
   LayoutGrid,
   FileSpreadsheet,
   FileText,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 interface CalcStateSnapshot {
@@ -68,15 +69,6 @@ export default function App() {
     }
     return loaded;
   });
-
-  const handleSetLayout = (layout: WorkspaceLayout) => {
-    setSettings((prev) => {
-      const updated = { ...prev, workspaceLayout: layout };
-      saveStoredSettings(updated);
-      return updated;
-    });
-    playKeySound('action', settings.soundVolume);
-  };
 
   const currentLayout: WorkspaceLayout = settings.workspaceLayout || 'audit-right';
 
@@ -656,6 +648,16 @@ export default function App() {
     setIsPrintPreviewOpen(true);
   }, []);
 
+  // Workspace Layout Switcher (2 Modes: audit-right vs audit-left)
+  const handleSetLayout = useCallback((layout: WorkspaceLayout) => {
+    setSettings((prev) => {
+      const updated = { ...prev, workspaceLayout: layout };
+      saveStoredSettings(updated);
+      return updated;
+    });
+    playKeySound('action', settings.soundVolume);
+  }, [settings.soundVolume]);
+
   // Reset defaults handler
   const handleResetDefaults = useCallback(() => {
     setSettings(DEFAULT_SETTINGS);
@@ -1048,10 +1050,18 @@ export default function App() {
     });
   }, []);
 
+  // Theme Toggle: Light / Dark Mode Toggle
+  const handleToggleTheme = useCallback(() => {
+    setSettings((prev) => ({
+      ...prev,
+      theme: prev.theme === 'light' ? 'dark' : 'light',
+    }));
+  }, []);
+
   // Theme Styling - Strictly 2 themes: dark and light
   const isLight = settings.theme === 'light';
   const themeContainerClass = isLight
-    ? 'bg-slate-100 text-slate-900'
+    ? 'bg-[#e6e4df] text-stone-900'
     : 'bg-slate-950 text-slate-100';
 
   const uiScaleClass =
@@ -1069,26 +1079,75 @@ export default function App() {
       {/* 1. Header Bar (Decluttered & Clean) */}
       <header
         id="app-header-bar"
-        className={`w-full border-b transition-all px-4 py-2.5 sm:px-6 lg:px-8 shrink-0 ${
-          isLight ? 'bg-white border-slate-300 shadow-xs' : 'bg-slate-900/90 border-slate-800 shadow-sm'
+        className={`w-full border-b transition-all px-4 py-2 sm:px-6 lg:px-8 shrink-0 ${
+          isLight ? 'bg-[#dedbd2] border-stone-300 shadow-xs' : 'bg-slate-900/90 border-slate-800 shadow-sm'
         }`}
       >
-        <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-3">
-          {/* Official NumeriX App Logo & Title */}
-          <div className="flex items-center gap-3">
+        <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-2.5 sm:gap-3">
+          {/* Left: Official NumeriX App Logo & Title (50% enlarged, Financial Pro badge omitted) */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <button
               id="header-logo-btn"
               onClick={() => setIsHelpOpen(true)}
               title="NumeriX Online Calculator - Click for Quick Guide & Shortcuts"
-              className="flex items-center gap-3 hover:opacity-90 transition-opacity cursor-pointer text-left"
+              className="flex items-center gap-2.5 sm:gap-3 hover:opacity-90 transition-opacity cursor-pointer text-left py-0.5"
             >
               <NumerixLogo size="sm" variant="horizontal" isLight={isLight} />
             </button>
-            <span className={`hidden md:inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-              isLight ? 'bg-cyan-100 text-cyan-900 border border-cyan-300' : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-            }`}>
-              Financial Pro
-            </span>
+          </div>
+
+          {/* Center: Sleek Top Slide Toggle for the 2 Layouts */}
+          <div className="flex items-center">
+            <div
+              id="header-layout-slide-toggle"
+              role="group"
+              aria-label="Workspace Layout Switcher"
+              className={`flex items-center p-0.5 sm:p-1 rounded-xl border transition-all select-none shadow-2xs ${
+                isLight ? 'bg-[#d3cfc4] border-stone-300' : 'bg-slate-950/90 border-slate-800'
+              }`}
+            >
+              {/* Option 1: Keypad Left • Audit Tape Right (DEFAULT) */}
+              <button
+                id="toggle-layout-audit-right"
+                type="button"
+                onClick={() => handleSetLayout('audit-right')}
+                title="Layout: Keypad on Left, Audit Tape on Right (Widescreen Default)"
+                className={`relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  currentLayout === 'audit-right'
+                    ? isLight
+                      ? 'bg-white text-cyan-950 shadow-xs border border-stone-300 font-extrabold ring-1 ring-cyan-600/30'
+                      : 'bg-cyan-500 text-slate-950 shadow-md font-black ring-1 ring-cyan-400/50'
+                    : isLight
+                    ? 'text-stone-800 hover:text-stone-950 hover:bg-stone-200/60'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+                }`}
+              >
+                <PanelRight className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Keypad Left</span>
+                <span className="sm:hidden text-[11px]">Left</span>
+              </button>
+
+              {/* Option 2: Audit Tape Left • Keypad Right */}
+              <button
+                id="toggle-layout-audit-left"
+                type="button"
+                onClick={() => handleSetLayout('audit-left')}
+                title="Layout: Audit Tape on Left, Keypad on Right (Classic Accounting Standard)"
+                className={`relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  currentLayout === 'audit-left'
+                    ? isLight
+                      ? 'bg-white text-cyan-950 shadow-xs border border-stone-300 font-extrabold ring-1 ring-cyan-600/30'
+                      : 'bg-cyan-500 text-slate-950 shadow-md font-black ring-1 ring-cyan-400/50'
+                    : isLight
+                    ? 'text-stone-800 hover:text-stone-950 hover:bg-stone-200/60'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+                }`}
+              >
+                <PanelLeft className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Keypad Right</span>
+                <span className="sm:hidden text-[11px]">Right</span>
+              </button>
+            </div>
           </div>
 
           {/* Right Header: Clean Essential Tools */}
@@ -1103,10 +1162,10 @@ export default function App() {
               className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
                 isNumLockOn
                   ? isLight
-                    ? 'bg-emerald-100 hover:bg-emerald-200 border-emerald-300 text-emerald-950 shadow-xs'
+                    ? 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-950 shadow-2xs'
                     : 'bg-emerald-950/60 hover:bg-emerald-900/80 border-emerald-700 text-emerald-300 shadow-xs'
                   : isLight
-                  ? 'bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-950 shadow-xs animate-pulse'
+                  ? 'bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-950 shadow-2xs animate-pulse'
                   : 'bg-amber-950/60 hover:bg-amber-900/80 border-amber-700 text-amber-300 shadow-xs animate-pulse'
               }`}
             >
@@ -1128,30 +1187,49 @@ export default function App() {
               onClick={handleToggleSound}
               title={
                 settings.soundEnabled
-                  ? 'Sound: ON (Enter key only) - Click to Mute'
+                  ? 'Sound: ON (Audible tactile clicks) - Click to Mute'
                   : 'Sound: OFF - Click to Turn Sound ON'
               }
               className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
                 settings.soundEnabled
                   ? isLight
-                    ? 'bg-emerald-100 hover:bg-emerald-200 border-emerald-300 text-emerald-950 shadow-xs'
+                    ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-900 shadow-2xs'
                     : 'bg-emerald-950/50 hover:bg-emerald-900/70 border-emerald-700 text-emerald-300 shadow-xs'
                   : isLight
-                  ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-700'
+                  ? 'bg-slate-200/80 hover:bg-slate-200 border-slate-300 text-slate-500'
                   : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-400'
               }`}
             >
               {settings.soundEnabled ? (
                 <>
-                  <Volume2 className={`w-4 h-4 ${isLight ? 'text-emerald-800' : 'text-emerald-400'}`} />
+                  <Volume2 className={`w-4 h-4 ${isLight ? 'text-cyan-700' : 'text-emerald-400'}`} />
                   <span className="text-[11px]">Sound: ON</span>
                 </>
               ) : (
                 <>
-                  <VolumeX className="w-4 h-4 text-slate-500" />
+                  <VolumeX className="w-4 h-4 text-slate-400" />
                   <span className="text-[11px]">Sound: OFF</span>
                 </>
               )}
+            </button>
+
+            {/* 2-Option Theme Toggle: Light / Dark Mode */}
+            <button
+              id="header-theme-btn"
+              onClick={handleToggleTheme}
+              title={`Switch Theme (Current: ${isLight ? 'Light Mode' : 'Dark Mode'}). Click to toggle.`}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
+                isLight
+                  ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-900 shadow-2xs'
+                  : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+              }`}
+            >
+              {isLight ? (
+                <Sun className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              ) : (
+                <Moon className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              )}
+              <span className="text-[11px]">{isLight ? 'LIGHT' : 'DARK'}</span>
             </button>
 
             {/* Quick PDF Report & Print Preview Button */}
@@ -1161,11 +1239,11 @@ export default function App() {
               title="Export calculation tape to PDF / Print Report (Ctrl+P)"
               className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
                 isLight
-                  ? 'bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-800 shadow-xs'
+                  ? 'bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-900 shadow-2xs'
                   : 'bg-rose-950/60 hover:bg-rose-900/80 border-rose-800 text-rose-300 shadow-xs'
               }`}
             >
-              <FileText className="w-4 h-4 text-rose-500" />
+              <FileText className="w-4 h-4 text-rose-600" />
               <span className="text-[11px]">PDF</span>
             </button>
 
@@ -1176,7 +1254,7 @@ export default function App() {
               title="Calculator Preferences, Presets & Logo"
               className={`p-2 rounded-lg border transition-colors cursor-pointer ${
                 isLight
-                  ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-800'
+                  ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-800 shadow-2xs'
                   : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
               }`}
             >
@@ -1190,7 +1268,7 @@ export default function App() {
               title="Keyboard shortcuts & Accounting manual (F1 or ?)"
               className={`p-2 rounded-lg border transition-colors cursor-pointer ${
                 isLight
-                  ? 'bg-cyan-100 hover:bg-cyan-200 border-cyan-300 text-cyan-950 font-bold'
+                  ? 'bg-cyan-50 hover:bg-cyan-100 border-cyan-300 text-cyan-950 font-bold shadow-2xs'
                   : 'bg-cyan-950/60 hover:bg-cyan-900 border-cyan-800 text-cyan-300'
               }`}
             >
@@ -1221,7 +1299,7 @@ export default function App() {
         </div>
       )}
 
-      {/* 2. Main Workstation Area */}
+      {/* 2. Main Workstation Area (2 Layout Modes: Audit Left vs Audit Right) */}
       <main className="flex-1 min-h-0 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto px-3 sm:px-5 lg:px-7 py-2 sm:py-2.5 flex flex-col justify-center">
         {currentLayout === 'audit-left' ? (
           /* Mode 2: Audit Left & Keypad Right (Accounting Standard) */
@@ -1265,83 +1343,7 @@ export default function App() {
               <div
                 className={`p-2.5 sm:p-3 lg:p-3.5 rounded-2xl border-2 transition-colors flex-1 flex flex-col justify-center min-h-0 ${
                   isLight
-                    ? 'bg-slate-50 border-slate-300 shadow-sm'
-                    : 'bg-slate-900/95 border-slate-800 shadow-md'
-                }`}
-              >
-                <Keypad
-                  onDigit={handleDigit}
-                  onOperator={handleOperator}
-                  onCalculate={handleCalculate}
-                  onClearAll={handleClearAll}
-                  onClearEntry={handleClearEntry}
-                  onBackspace={handleBackspace}
-                  onSignToggle={handleSignToggle}
-                  onPercent={handlePercent}
-                  onParenthesis={handleParenthesis}
-                  onTaxPlus={handleTaxPlus}
-                  onTaxMinus={handleTaxMinus}
-                  onMarkup={handleMarkup}
-                  onMargin={handleMargin}
-                  onDiscount={handleDiscount}
-                  onMemoryClear={handleMemoryClear}
-                  onMemoryRecall={handleMemoryRecall}
-                  onMemoryAdd={handleMemoryAdd}
-                  onMemorySubtract={handleMemorySubtract}
-                  onMemoryStore={handleMemoryStore}
-                  onSubtotal={handleSubtotal}
-                  onGrandTotal={handleGrandTotal}
-                  settings={settings}
-                  activeKeyId={activeKeyId}
-                  isNumLockOn={isNumLockOn}
-                  onToggleNumLock={handleToggleNumLock}
-                />
-              </div>
-            </section>
-          </div>
-        ) : currentLayout === 'audit-top' ? (
-          /* Mode 3: Audit Up & Keypad Down (Vertical Stacked Layout) */
-          <div className="flex flex-col gap-3 lg:gap-3.5 items-stretch h-full min-h-0 max-w-2xl sm:max-w-3xl lg:max-w-3xl xl:max-w-4xl mx-auto w-full overflow-y-auto pr-0.5" style={{ scrollbarWidth: 'thin' }}>
-            {/* Top Area: Paper Tape / Calculation Audit History */}
-            <section className="h-[250px] sm:h-[280px] lg:h-[300px] shrink-0 flex flex-col">
-              <TapeHistory
-                records={tapeRecords}
-                settings={settings}
-                onReuseValue={handleReuseValue}
-                onDeleteRecord={handleDeleteRecord}
-                onClearTape={handleClearTape}
-                onExportExcel={handleExportExcel}
-                onExportPdf={handleExportPdf}
-                onPrint={handleOpenPrintPreview}
-                onUpdateRecordNote={handleUpdateRecordNote}
-              />
-            </section>
-
-            {/* Bottom Area: Calculator Display, Decimal Controls & Keypad */}
-            <section className="flex flex-col gap-2 sm:gap-2.5 shrink-0">
-              <CalculatorDisplay
-                expression={expression}
-                currentInput={currentInput}
-                result={result}
-                errorMessage={errorMessage}
-                memoryValue={memoryValue}
-                grandTotal={grandTotal}
-                settings={settings}
-                canUndo={pastStates.length > 0}
-                canRedo={futureStates.length > 0}
-                onUndo={handleUndo}
-                onRedo={handleRedo}
-                onDecIncrease={handleDecIncrease}
-                onDecDecrease={handleDecDecrease}
-                onDirectDecSet={handleDirectDecSet}
-                isNumLockOn={isNumLockOn}
-                onToggleNumLock={handleToggleNumLock}
-              />
-
-              <div
-                className={`p-2.5 sm:p-3 lg:p-3.5 rounded-2xl border-2 transition-colors flex flex-col justify-center ${
-                  isLight
-                    ? 'bg-slate-50 border-slate-300 shadow-sm'
+                    ? 'bg-[#dedbd2] border-stone-300 shadow-xs'
                     : 'bg-slate-900/95 border-slate-800 shadow-md'
                 }`}
               >
@@ -1402,7 +1404,7 @@ export default function App() {
               <div
                 className={`p-2.5 sm:p-3 lg:p-3.5 rounded-2xl border-2 transition-colors flex-1 flex flex-col justify-center min-h-0 ${
                   isLight
-                    ? 'bg-slate-50 border-slate-300 shadow-sm'
+                    ? 'bg-[#dedbd2] border-stone-300 shadow-xs'
                     : 'bg-slate-900/95 border-slate-800 shadow-md'
                 }`}
               >
@@ -1454,85 +1456,11 @@ export default function App() {
         )}
       </main>
 
-      {/* 3. Bottom 3-Mode Layout Switcher Bar */}
-      <aside
-        id="bottom-layout-bar"
-        aria-label="Workspace Layout Switcher"
-        className={`w-full py-1.5 px-4 sm:px-6 lg:px-8 border-t flex items-center justify-center select-none transition-colors shrink-0 ${
-          isLight ? 'bg-slate-100/95 border-slate-300' : 'bg-slate-950/95 border-slate-850'
-        }`}
-      >
-        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider opacity-60 mr-1 hidden sm:inline-flex items-center gap-1">
-            <LayoutGrid className="w-3.5 h-3.5 text-cyan-500" />
-            <span>Layout:</span>
-          </span>
-
-          {/* Mode 1: Audit Right & Keypad Left (DEFAULT) */}
-          <button
-            id="btn-layout-audit-right"
-            onClick={() => handleSetLayout('audit-right')}
-            title="Mode 1: Keypad on Left, Audit Tape on Right (Default 16:9 widescreen layout)"
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
-              currentLayout === 'audit-right'
-                ? isLight
-                  ? 'bg-cyan-600 text-white shadow-sm border border-cyan-700 font-extrabold ring-2 ring-cyan-500/30'
-                  : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/70 shadow-xs font-extrabold ring-2 ring-cyan-500/20'
-                : isLight
-                ? 'bg-white hover:bg-slate-200/80 border border-slate-300 text-slate-700'
-                : 'bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400'
-            }`}
-          >
-            <PanelRight className="w-3.5 h-3.5" />
-            <span>Audit Right • Keypad Left</span>
-            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hidden md:inline">DEFAULT</span>
-          </button>
-
-          {/* Mode 2: Audit Left & Keypad Right */}
-          <button
-            id="btn-layout-audit-left"
-            onClick={() => handleSetLayout('audit-left')}
-            title="Mode 2: Audit Tape on Left, Keypad on Right (Classic accounting layout)"
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
-              currentLayout === 'audit-left'
-                ? isLight
-                  ? 'bg-cyan-600 text-white shadow-sm border border-cyan-700 font-extrabold ring-2 ring-cyan-500/30'
-                  : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/70 shadow-xs font-extrabold ring-2 ring-cyan-500/20'
-                : isLight
-                ? 'bg-white hover:bg-slate-200/80 border border-slate-300 text-slate-700'
-                : 'bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400'
-            }`}
-          >
-            <PanelLeft className="w-3.5 h-3.5" />
-            <span>Audit Left • Keypad Right</span>
-          </button>
-
-          {/* Mode 3: Audit Up & Keypad Down */}
-          <button
-            id="btn-layout-audit-top"
-            onClick={() => handleSetLayout('audit-top')}
-            title="Mode 3: Audit Tape Up, Keypad Down (Vertical stacked feed)"
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
-              currentLayout === 'audit-top'
-                ? isLight
-                  ? 'bg-cyan-600 text-white shadow-sm border border-cyan-700 font-extrabold ring-2 ring-cyan-500/30'
-                  : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/70 shadow-xs font-extrabold ring-2 ring-cyan-500/20'
-                : isLight
-                ? 'bg-white hover:bg-slate-200/80 border border-slate-300 text-slate-700'
-                : 'bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400'
-            }`}
-          >
-            <PanelTop className="w-3.5 h-3.5" />
-            <span>Audit Up • Keypad Down</span>
-          </button>
-        </div>
-      </aside>
-
       {/* 3. Footer */}
       <footer
         id="app-footer-bar"
         className={`w-full py-1.5 px-4 sm:px-6 lg:px-8 border-t text-center select-none transition-colors shrink-0 ${
-          isLight ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950/80 border-slate-850 text-slate-400'
+          isLight ? 'bg-[#dedbd2] border-stone-300 text-stone-800' : 'bg-slate-950/80 border-slate-850 text-slate-400'
         }`}
       >
         <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex items-center justify-between text-[11px] sm:text-xs">
@@ -1568,7 +1496,7 @@ export default function App() {
             </button>
           </div>
           <div className="font-medium opacity-75">
-            By: N.Shaaeri
+            By: N.Shaaeri/A.Kanani
           </div>
         </div>
       </footer>

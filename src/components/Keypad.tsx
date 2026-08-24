@@ -91,28 +91,28 @@ export const Keypad: React.FC<KeypadProps> = ({
   // Function keys: Crisp contrast borders without hover effect
   const fnBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-slate-100 border-2 border-slate-300 text-slate-900 font-extrabold'
+      ? 'bg-slate-100 border-2 border-slate-300 text-slate-800 font-bold'
       : 'bg-slate-900 border border-slate-750 text-slate-200 font-bold'
   }`;
 
   // Tax keys without hover effect
   const taxBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-amber-100 border-2 border-amber-400 text-amber-950 font-extrabold'
+      ? 'bg-amber-50 border-2 border-amber-300 text-amber-950 font-bold'
       : 'bg-amber-950/50 border border-amber-700/80 text-amber-300 font-bold'
   }`;
 
   // Memory keys without hover effect
   const memBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-indigo-100 border-2 border-indigo-400 text-indigo-950 font-extrabold'
+      ? 'bg-indigo-50 border-2 border-indigo-300 text-indigo-950 font-bold'
       : 'bg-indigo-950/50 border border-indigo-700/80 text-indigo-300 font-bold'
   }`;
 
   // Clear keys without hover effect
   const clearBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-rose-100 border-2 border-rose-400 text-rose-950 font-extrabold'
+      ? 'bg-rose-50 border-2 border-rose-300 text-rose-950 font-bold'
       : 'bg-rose-950/50 border border-rose-700/80 text-rose-300 font-bold'
   }`;
 

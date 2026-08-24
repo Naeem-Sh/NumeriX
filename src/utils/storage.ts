@@ -31,7 +31,8 @@ export function loadStoredSettings(): CalculatorSettings {
     const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (!raw) return { ...DEFAULT_SETTINGS };
     const parsed = JSON.parse(raw);
-    return { ...DEFAULT_SETTINGS, ...parsed };
+    const layout = (parsed.workspaceLayout === 'audit-left' || parsed.workspaceLayout === 'audit-right') ? parsed.workspaceLayout : 'audit-right';
+    return { ...DEFAULT_SETTINGS, ...parsed, workspaceLayout: layout };
   } catch {
     return { ...DEFAULT_SETTINGS };
   }

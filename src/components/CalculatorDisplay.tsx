@@ -91,7 +91,7 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
   const getShaderClass = () => {
     if (isLight) {
       if (displayStyle === 'classic_lcd') return 'shader-classic-lcd';
-      return 'bg-white border-slate-300 text-slate-950 shadow-sm';
+      return 'bg-[#fcfdfd] border-slate-300 text-slate-950 shadow-inner';
     }
     switch (displayStyle) {
       case 'amber_glow':

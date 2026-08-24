@@ -14,11 +14,11 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
   className = '',
 }) => {
   const sizeMap = {
-    xs: { icon: 24, text: 'text-xs', subtext: 'text-[8px]', height: 28 },
-    sm: { icon: 34, text: 'text-sm', subtext: 'text-[9px]', height: 38 },
-    md: { icon: 44, text: 'text-lg', subtext: 'text-[11px]', height: 48 },
-    lg: { icon: 64, text: 'text-2xl', subtext: 'text-xs', height: 72 },
-    xl: { icon: 96, text: 'text-4xl', subtext: 'text-sm', height: 110 },
+    xs: { icon: 36, text: 'text-sm', subtext: 'text-[9px]', height: 38 },
+    sm: { icon: 51, text: 'text-lg', subtext: 'text-[11px]', height: 52 },
+    md: { icon: 66, text: 'text-2xl', subtext: 'text-xs', height: 68 },
+    lg: { icon: 96, text: 'text-3xl', subtext: 'text-sm', height: 100 },
+    xl: { icon: 144, text: 'text-5xl', subtext: 'text-base', height: 150 },
   };
 
   const currentSize = sizeMap[size];

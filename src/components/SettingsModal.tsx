@@ -12,7 +12,6 @@ import {
   RotateCcw,
   PanelRight,
   PanelLeft,
-  PanelTop,
   LayoutGrid,
   Sparkles,
   CheckCircle2,
@@ -361,12 +360,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
-          {/* 2. Workspace Layout (16:9 Displays & Multi-Column Modes) */}
+          {/* 2. Workspace Layout (Side-by-Side Dual Modes) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 font-bold">
                 <LayoutGrid className="w-4 h-4 text-cyan-500" />
-                <span>Workstation Layout Mode (3 Modes)</span>
+                <span>Workstation Layout Mode (2 Modes)</span>
               </label>
               <span className="text-xs font-mono opacity-70">
                 {(settings.workspaceLayout || 'audit-right').toUpperCase()}
@@ -377,7 +376,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               Optimize the position of the numeric keypad and audit tape ledger for your screen size and handedness.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {[
                 {
                   id: 'audit-right' as WorkspaceLayout,
@@ -394,14 +393,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   description: 'Audit tape on Left, primary calculator and keypad on Right',
                   icon: PanelLeft,
                   badge: 'STANDARD',
-                },
-                {
-                  id: 'audit-top' as WorkspaceLayout,
-                  title: 'Audit Up / Keypad Down',
-                  subtitle: 'Vertical Ledger Stack',
-                  description: 'Audit tape on Top feeding downward, keypad and display at Bottom',
-                  icon: PanelTop,
-                  badge: 'VERTICAL',
                 },
               ].map((m) => {
                 const isSelected = (settings.workspaceLayout || 'audit-right') === m.id;

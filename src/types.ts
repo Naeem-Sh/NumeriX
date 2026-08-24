@@ -1,7 +1,7 @@
 export type NumberFormatType = 'comma_dot' | 'dot_comma' | 'space_dot' | 'apostrophe_dot';
 export type AppTheme = 'dark' | 'light';
 export type DateFormatType = 'EU' | 'US' | 'ISO';
-export type WorkspaceLayout = 'audit-right' | 'audit-left' | 'audit-top';
+export type WorkspaceLayout = 'audit-right' | 'audit-left';
 export type DisplayStyle = 'vfd_emerald' | 'amber_glow' | 'oled_ice' | 'classic_lcd';
 export type UiScale = 'compact' | 'standard' | 'expanded';
 
