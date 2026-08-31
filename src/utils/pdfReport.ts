@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { CalculationRecord, CalculatorSettings, PrintOptions } from '../types';
 import { formatAccountingNumber } from './numberFormat';
-import { NUMERIX_LOGO_DATA_URL, NUMERIX_EMBLEM_DATA_URL } from './numerixLogoAsset';
+import { getNumerixHorizontalLogoPng, getNumerixEmblemLogoPng } from './numerixLogoAsset';
 
 export function generatePdfReport(
   records: CalculationRecord[],
@@ -39,22 +39,31 @@ export function generatePdfReport(
 
   let startY = margin;
 
-  // 1. Draw Header & Logo
+  // 1. Draw Header & High-Resolution NumeriX Logo
   const showAppLogo = customOptions?.showLogo !== false;
+  let logoEmbedded = false;
+
   if (showAppLogo) {
     try {
-      // Use official NumeriX logo
-      doc.addImage(NUMERIX_LOGO_DATA_URL, 'SVG', margin, startY - 2, 34, 20.4, undefined, 'FAST');
+      const horizontalLogoPng = getNumerixHorizontalLogoPng();
+      if (horizontalLogoPng) {
+        doc.addImage(horizontalLogoPng, 'PNG', margin, startY, 44, 13.5, undefined, 'FAST');
+        logoEmbedded = true;
+      }
     } catch {
       try {
-        doc.addImage(NUMERIX_EMBLEM_DATA_URL, 'SVG', margin, startY, 18, 18, undefined, 'FAST');
+        const emblemLogoPng = getNumerixEmblemLogoPng();
+        if (emblemLogoPng) {
+          doc.addImage(emblemLogoPng, 'PNG', margin, startY, 15, 15, undefined, 'FAST');
+          logoEmbedded = true;
+        }
       } catch {
-        // Proceed gracefully if SVG embedding is not available
+        // Fallback gracefully
       }
     }
   }
 
-  const headerLeftOffset = showAppLogo ? margin + 38 : margin;
+  const headerLeftOffset = logoEmbedded ? margin + 48 : showAppLogo ? margin + 40 : margin;
 
   if (customOptions?.showCompanyHeader !== false) {
     // Company Name

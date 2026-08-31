@@ -1275,7 +1275,7 @@ export default function App() {
       )}
 
       {/* 2. Main Workstation Area (2 Layout Modes: Audit Left vs Audit Right) */}
-      <main className="flex-1 min-h-0 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto px-3 sm:px-5 lg:px-7 py-2 sm:py-2.5 flex flex-col justify-center">
+      <main id="app-main-workspace" className="flex-1 min-h-0 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto px-3 sm:px-5 lg:px-7 py-2 sm:py-2.5 flex flex-col justify-center">
         {currentLayout === 'audit-left' ? (
           /* Mode 2: Audit Left & Keypad Right (Accounting Standard) */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-stretch h-full min-h-0">

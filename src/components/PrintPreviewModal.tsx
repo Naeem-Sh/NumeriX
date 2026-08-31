@@ -191,6 +191,16 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
       id="print-preview-modal-backdrop"
       className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-hidden"
     >
+      {/* Dynamic Print Page Media Styling */}
+      <style>{`
+        @media print {
+          @page {
+            size: ${isReceipt ? '80mm auto' : `${options.paperSize} ${options.orientation}`};
+            margin: ${isReceipt ? '3mm 4mm' : '8mm 12mm 8mm 12mm'};
+          }
+        }
+      `}</style>
+
       <motion.div
         id="print-preview-modal"
         initial={{ opacity: 0, scale: 0.96 }}
@@ -200,7 +210,7 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
         className="relative flex flex-col w-full max-w-7xl h-[92vh] bg-slate-900 border border-slate-700 text-slate-100 rounded-2xl shadow-2xl overflow-hidden"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-800 bg-slate-950/70 shrink-0">
+        <div id="print-modal-header" className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-800 bg-slate-950/70 shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
               <Printer className="w-5 h-5" />
@@ -253,9 +263,9 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
         </div>
 
         {/* Modal Main Area: Options Sidebar + Live Paper Preview */}
-        <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
+        <div id="print-modal-body" className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
           {/* Left Column: Print Options & Controls */}
-          <div className="w-full lg:w-96 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-800 bg-slate-950/40 shrink-0">
+          <div id="print-modal-sidebar" className="w-full lg:w-96 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-800 bg-slate-950/40 shrink-0">
             {/* Sidebar Tabs */}
             <div className="flex border-b border-slate-800 bg-slate-900/60 p-1.5 gap-1 shrink-0">
               <button
@@ -612,9 +622,9 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
           </div>
 
           {/* Right Column: Live Sheet Preview Canvas */}
-          <div className="flex-1 flex flex-col min-w-0 bg-slate-950/80 overflow-hidden">
+          <div id="print-preview-canvas-container" className="flex-1 flex flex-col min-w-0 bg-slate-950/80 overflow-hidden">
             {/* Preview Toolbar */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800 bg-slate-900/50 shrink-0">
+            <div id="print-preview-toolbar" className="flex items-center justify-between px-4 py-2 border-b border-slate-800 bg-slate-900/50 shrink-0">
               <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
                 <span>Format: <strong>{options.paperSize}</strong></span>
                 <span>•</span>
@@ -653,8 +663,9 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
             </div>
 
             {/* Scrollable Sheet Stage */}
-            <div className="flex-1 overflow-auto p-4 sm:p-8 flex items-start justify-center">
+            <div id="print-sheet-stage" className="flex-1 overflow-auto p-4 sm:p-8 flex items-start justify-center">
               <div
+                id="print-sheet-paper"
                 style={{
                   transform: `scale(${previewZoom / 100})`,
                   transformOrigin: 'top center',
