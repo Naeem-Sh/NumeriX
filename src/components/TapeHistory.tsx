@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'motion/react';
 interface TapeHistoryProps {
   records: CalculationRecord[];
   settings: CalculatorSettings;
+  enterTrigger?: number;
   onReuseValue: (value: number) => void;
   onDeleteRecord: (id: string) => void;
   onClearTape: () => void;
@@ -32,6 +33,7 @@ interface TapeHistoryProps {
 export const TapeHistory: React.FC<TapeHistoryProps> = ({
   records,
   settings,
+  enterTrigger = 0,
   onReuseValue,
   onDeleteRecord,
   onClearTape,
@@ -48,6 +50,9 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [tempNote, setTempNote] = useState<string>('');
+  const [heartbeatKey, setHeartbeatKey] = useState<number>(0);
+  const [isHeartbeating, setIsHeartbeating] = useState<boolean>(false);
+  const heartbeatTimerRef = useRef<number | null>(null);
   const noteInputRef = useRef<HTMLInputElement>(null);
   const tapeContainerRef = useRef<HTMLDivElement>(null);
   const bottomAnchorRef = useRef<HTMLDivElement>(null);
@@ -57,6 +62,42 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
 
   const isLight = settings.theme === 'light';
   const dualColorRibbon = settings.dualColorRibbon ?? true;
+
+  // Seamless 3-beat heartbeat trigger
+  const triggerHeartbeat = useCallback(() => {
+    setHeartbeatKey((prev) => prev + 1);
+    setIsHeartbeating(true);
+    if (heartbeatTimerRef.current) {
+      window.clearTimeout(heartbeatTimerRef.current);
+    }
+    heartbeatTimerRef.current = window.setTimeout(() => {
+      setIsHeartbeating(false);
+    }, 2650);
+  }, []);
+
+  // Trigger heartbeat when enter is pressed
+  useEffect(() => {
+    if (enterTrigger > 0) {
+      triggerHeartbeat();
+    }
+  }, [enterTrigger, triggerHeartbeat]);
+
+  // Also trigger heartbeat whenever a new record is added to the tape
+  useEffect(() => {
+    if (records.length > prevCountRef.current) {
+      triggerHeartbeat();
+    }
+    prevCountRef.current = records.length;
+  }, [records.length, triggerHeartbeat]);
+
+  // Clean up heartbeat timer
+  useEffect(() => {
+    return () => {
+      if (heartbeatTimerRef.current) {
+        window.clearTimeout(heartbeatTimerRef.current);
+      }
+    };
+  }, []);
 
   // Focus input when starting note edit
   useEffect(() => {
@@ -232,7 +273,25 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
       >
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 font-extrabold tracking-wider uppercase">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <div className="relative flex items-center justify-center w-3.5 h-3.5">
+              {/* Ripple aura radiating 3 times on heartbeat */}
+              {isHeartbeating && (
+                <span
+                  key={`ripple-${heartbeatKey}`}
+                  className="absolute inset-0 rounded-full bg-emerald-400 pointer-events-none animate-heartbeat-ripple-3x"
+                />
+              )}
+              {/* Core emerald status indicator with 3-cycle heartbeat pulse */}
+              <span
+                key={`dot-${heartbeatKey}`}
+                className={`w-2.5 h-2.5 rounded-full bg-emerald-500 transition-all ${
+                  isHeartbeating
+                    ? 'animate-heartbeat-3x ring-2 ring-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.9)]'
+                    : 'shadow-2xs border border-emerald-400/40 opacity-90 hover:opacity-100'
+                }`}
+                title="Audit Tape Status: Active (Flashes 3x on Enter)"
+              />
+            </div>
             <span className={isLight ? 'text-stone-900' : 'text-slate-100'}>Audit Tape</span>
             <span
               className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold ${

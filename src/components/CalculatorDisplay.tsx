@@ -47,6 +47,10 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
   const isLight = settings.theme === 'light';
   const displayStyle = settings.displayStyle || 'vfd_emerald';
 
+  // Memory & Grand Total active state (non-zero value)
+  const hasMemory = memoryValue !== null && Math.abs(memoryValue) > 1e-12;
+  const hasGrandTotal = grandTotal !== null && Math.abs(grandTotal) > 1e-12;
+
   // Value to display in large primary result
   let primaryDisplayValue = '0';
   if (errorMessage) {
@@ -153,12 +157,13 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
       <div className="flex items-center justify-between text-xs mb-1 opacity-90 select-none">
         {/* Left: Memory & GT badges */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {memoryValue !== null && (
+          {hasMemory && (
             <span
+              id="display-memory-badge"
               className={`px-1.5 py-0.5 rounded font-mono text-[10px] sm:text-[11px] font-black border ${
                 isLight
-                  ? 'bg-amber-100 border-amber-400 text-amber-950'
-                  : 'bg-amber-950/60 border-amber-700/80 text-amber-300'
+                  ? 'bg-amber-100 border-amber-400 text-amber-950 shadow-2xs'
+                  : 'bg-amber-950/60 border-amber-700/80 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
               }`}
               title={`Memory Register: ${memoryValue}`}
             >
@@ -166,8 +171,9 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
             </span>
           )}
 
-          {grandTotal !== null && grandTotal !== 0 && (
+          {hasGrandTotal && (
             <span
+              id="display-gt-badge"
               className={`px-1.5 py-0.5 rounded font-mono text-[10px] sm:text-[11px] font-black border ${
                 isLight
                   ? 'bg-indigo-100 border-indigo-400 text-indigo-950'
@@ -278,12 +284,42 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
       </div>
 
       {/* Primary Display / Giant Formatted Number with Click-to-Copy */}
-      <div className="relative flex items-center justify-end min-h-[48px] sm:min-h-[56px] lg:min-h-[64px] py-1 group/res">
+      <div className="relative flex items-center justify-between min-h-[48px] sm:min-h-[56px] lg:min-h-[64px] py-1 group/res gap-2">
+        {/* Left Annunciators: Classic Desktop Calculator 'M' Memory & 'GT' Flags */}
+        <div className="flex items-center gap-1.5 self-center shrink-0 select-none">
+          {hasMemory && (
+            <span
+              id="display-memory-flag-m"
+              title={`Memory In Use: ${formatAccountingNumber(memoryValue, settings.decimalPlaces, settings.numberFormat)}`}
+              className={`px-1.5 py-0.5 rounded text-[11px] sm:text-xs font-black font-mono tracking-wider border transition-all ${
+                isLight
+                  ? 'bg-amber-100 text-amber-950 border-amber-400 shadow-2xs font-extrabold ring-1 ring-amber-400/50'
+                  : 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.35)] ring-1 ring-amber-500/40 font-black'
+              }`}
+            >
+              M
+            </span>
+          )}
+          {hasGrandTotal && (
+            <span
+              id="display-gt-flag"
+              title={`Grand Total In Use: ${formatAccountingNumber(grandTotal, settings.decimalPlaces, settings.numberFormat)}`}
+              className={`px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-black font-mono tracking-wider border transition-all ${
+                isLight
+                  ? 'bg-indigo-100 text-indigo-950 border-indigo-300'
+                  : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50'
+              }`}
+            >
+              GT
+            </span>
+          )}
+        </div>
+
         <div
           id="calculator-result-text"
           onClick={() => handleCopy(false)}
           title="Click to copy formatted result to clipboard"
-          className={`font-mono font-black tracking-tight text-right select-all overflow-x-auto scrollbar-none cursor-pointer rounded-lg px-1 transition-all ${
+          className={`flex-1 font-mono font-black tracking-tight text-right select-all overflow-x-auto scrollbar-none cursor-pointer rounded-lg px-1 transition-all ${
             errorMessage
               ? 'text-rose-600 text-xl sm:text-2xl font-sans cursor-default font-bold'
               : primaryDisplayValue.length > 16

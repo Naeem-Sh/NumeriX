@@ -48,7 +48,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose, settings 
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {[
-                { key: 'Num Lock', desc: 'Toggle hardware numeric keypad numbers (LED indicator on display & header)' },
+                { key: 'Num Lock', desc: 'Toggle hardware numeric keypad numbers (LED indicator on display)' },
                 { key: '0 – 9, . , 00', desc: 'Type numbers directly or via NumPad' },
                 { key: '+ , − , * , /', desc: 'Standard arithmetic operators' },
                 { key: 'Enter or =', desc: 'Execute calculation & record to tape' },

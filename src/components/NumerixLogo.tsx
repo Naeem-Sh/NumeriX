@@ -158,7 +158,7 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
               isLight ? 'text-slate-500' : 'text-slate-400'
             } ${currentSize.subtext}`}
           >
-            ONLINE CALCULATOR
+            WEB CALCULATOR
           </span>
         </div>
       </div>
@@ -189,7 +189,7 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
             isLight ? 'text-slate-500' : 'text-slate-400'
           } ${currentSize.subtext}`}
         >
-          ONLINE CALCULATOR
+          WEB CALCULATOR
         </span>
       </div>
     </div>

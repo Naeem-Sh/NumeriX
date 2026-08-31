@@ -95,6 +95,9 @@ export default function App() {
   // Num Lock Detection & Live Status
   const [isNumLockOn, setIsNumLockOn] = useState<boolean>(true);
 
+  // Enter / Calculate heartbeat pulse trigger for audit tape indicator
+  const [enterPulseTrigger, setEnterPulseTrigger] = useState<number>(0);
+
   // Reference for active key flash timeout
   const keyFlashTimeout = useRef<number | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
@@ -295,6 +298,7 @@ export default function App() {
   // Primary Calculation (Enter / =)
   const handleCalculate = useCallback(() => {
     triggerKeyFeedback('enter', 'enter');
+    setEnterPulseTrigger((prev) => prev + 1);
 
     let fullExpr = expression;
     if (currentInput !== '') {
@@ -1089,7 +1093,7 @@ export default function App() {
             <button
               id="header-logo-btn"
               onClick={() => setIsHelpOpen(true)}
-              title="NumeriX Online Calculator - Click for Quick Guide & Shortcuts"
+              title="NumeriX Web Calculator - Click for Quick Guide & Shortcuts"
               className="flex items-center gap-2.5 sm:gap-3 hover:opacity-90 transition-opacity cursor-pointer text-left py-0.5"
             >
               <NumerixLogo size="sm" variant="horizontal" isLight={isLight} />
@@ -1152,35 +1156,6 @@ export default function App() {
 
           {/* Right Header: Clean Essential Tools */}
           <div className="flex items-center gap-2 sm:gap-2.5">
-            {/* Num Lock Status Quick Indicator */}
-            <button
-              id="header-numlock-btn"
-              onClick={handleToggleNumLock}
-              title={`Physical Keyboard Num Lock: ${
-                isNumLockOn ? 'ON (Active)' : 'OFF (Arrow/Navigation Mode)'
-              }. Press NumLock key on keyboard or click to toggle.`}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
-                isNumLockOn
-                  ? isLight
-                    ? 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-950 shadow-2xs'
-                    : 'bg-emerald-950/60 hover:bg-emerald-900/80 border-emerald-700 text-emerald-300 shadow-xs'
-                  : isLight
-                  ? 'bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-950 shadow-2xs animate-pulse'
-                  : 'bg-amber-950/60 hover:bg-amber-900/80 border-amber-700 text-amber-300 shadow-xs animate-pulse'
-              }`}
-            >
-              <span
-                className={`w-2 h-2 rounded-full transition-all shrink-0 ${
-                  isNumLockOn
-                    ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]'
-                    : 'bg-amber-500 shadow-[0_0_6px_#f59e0b]'
-                }`}
-              />
-              <span className="text-[11px] font-mono">
-                NUM: {isNumLockOn ? 'ON' : 'OFF'}
-              </span>
-            </button>
-
             {/* 2-Option Sound Toggle: Sound ON / OFF (Enter key only when ON) */}
             <button
               id="header-sound-toggle-btn"
@@ -1309,6 +1284,7 @@ export default function App() {
               <TapeHistory
                 records={tapeRecords}
                 settings={settings}
+                enterTrigger={enterPulseTrigger}
                 onReuseValue={handleReuseValue}
                 onDeleteRecord={handleDeleteRecord}
                 onClearTape={handleClearTape}
@@ -1443,6 +1419,7 @@ export default function App() {
               <TapeHistory
                 records={tapeRecords}
                 settings={settings}
+                enterTrigger={enterPulseTrigger}
                 onReuseValue={handleReuseValue}
                 onDeleteRecord={handleDeleteRecord}
                 onClearTape={handleClearTape}
@@ -1464,36 +1441,8 @@ export default function App() {
         }`}
       >
         <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex items-center justify-between text-[11px] sm:text-xs">
-          <div className="flex items-center gap-2.5 font-bold tracking-wider uppercase opacity-90">
+          <div className="flex items-center gap-2 font-bold tracking-wider uppercase opacity-90">
             <span>IOOC-ShirazOffice</span>
-            <span className="opacity-30">|</span>
-            {/* Real physical keyboard Num Lock status badge at bottom */}
-            <button
-              type="button"
-              id="footer-numlock-status-btn"
-              onClick={handleToggleNumLock}
-              title={`Physical Keyboard NumLock Status: ${
-                isNumLockOn ? 'ON (Numpad Digits Active)' : 'OFF (Arrow & Navigation Mode)'
-              }. Click to toggle or press NumLock key on your keyboard.`}
-              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors cursor-pointer ${
-                isNumLockOn
-                  ? isLight
-                    ? 'bg-emerald-100 text-emerald-950 border-emerald-300 shadow-xs hover:bg-emerald-200'
-                    : 'bg-emerald-950/60 text-emerald-300 border-emerald-700 shadow-xs hover:bg-emerald-900/80'
-                  : isLight
-                  ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs animate-pulse hover:bg-amber-200'
-                  : 'bg-amber-950/60 text-amber-300 border-amber-700 shadow-xs animate-pulse hover:bg-amber-900/80'
-              }`}
-            >
-              <span
-                className={`w-2 h-2 rounded-full transition-all shrink-0 ${
-                  isNumLockOn
-                    ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]'
-                    : 'bg-amber-500 shadow-[0_0_6px_#f59e0b]'
-                }`}
-              />
-              <span>NUM LOCK: {isNumLockOn ? 'ON' : 'OFF'}</span>
-            </button>
           </div>
           <div className="font-medium opacity-75">
             By: N.Shaaeri/A.Kanani
