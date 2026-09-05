@@ -67,60 +67,67 @@ export const Keypad: React.FC<KeypadProps> = ({
     isLight ? 'keycap-light-sculpted' : 'keycap-sculpted'
   }`;
 
-  // Number keys (0, 1, 2, ..., 9): High contrast with exclusive tactile hover effects
+  // Number keys (0, 1, 2, ..., 9): High contrast with primary accent glowing border
   const numBtn = `${btnBase} fluid-keypad-num ${
     isLight
-      ? 'bg-white hover:bg-sky-50 hover:border-sky-500 hover:text-sky-950 border-2 border-slate-300 text-slate-950 font-mono font-black text-lg sm:text-xl lg:text-2xl 2xl:text-3xl'
-      : 'bg-slate-800/95 hover:bg-slate-750 hover:border-cyan-400/80 hover:text-cyan-100 border border-slate-700/90 text-white font-mono font-bold text-lg sm:text-xl lg:text-2xl 2xl:text-3xl'
+      ? 'bg-white hover:bg-stone-50 hover:text-stone-950 border-2 border-stone-300 text-stone-950 font-mono font-black text-lg sm:text-xl lg:text-2xl 2xl:text-3xl shadow-2xs'
+      : 'bg-slate-800/95 hover:bg-slate-750 hover:text-cyan-100 border border-slate-700/90 text-white font-mono font-bold text-lg sm:text-xl lg:text-2xl 2xl:text-3xl'
   }`;
 
-  // Decimal Point key (no hover effect)
+  // Decimal Point key
   const dotBtn = `${btnBase} ${
     isLight
-      ? 'bg-white border-2 border-slate-300 text-slate-950 font-mono font-black text-xl sm:text-2xl'
-      : 'bg-slate-800/95 border border-slate-700/90 text-white font-mono font-bold text-xl sm:text-2xl'
+      ? 'bg-white hover:bg-stone-50 border-2 border-stone-300 text-stone-950 font-mono font-black text-xl sm:text-2xl shadow-2xs'
+      : 'bg-slate-800/95 hover:bg-slate-750 border border-slate-700/90 text-white font-mono font-bold text-xl sm:text-2xl'
   }`;
 
-  // Operator keys: High contrast teal/cyan without hover effect
+  // Operator keys: High contrast teal/cyan
   const opBtn = `${btnBase} fluid-keypad-op ${
     isLight
-      ? 'bg-cyan-100/90 border-2 border-cyan-300 text-cyan-950 font-mono font-black text-lg sm:text-xl lg:text-2xl'
-      : 'bg-cyan-950/70 border border-cyan-700/80 text-cyan-300 font-mono font-bold text-lg sm:text-xl lg:text-2xl'
+      ? 'bg-cyan-100 hover:bg-cyan-50 border-2 border-cyan-300 text-cyan-950 font-mono font-black text-lg sm:text-xl lg:text-2xl shadow-2xs'
+      : 'bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-700/80 text-cyan-300 font-mono font-bold text-lg sm:text-xl lg:text-2xl'
   }`;
 
-  // Function keys: Crisp contrast borders without hover effect
+  // Dedicated Tall Accumulator Plus Key (+) spanning 2 vertical rows
+  const plusAccumulatorBtn = `${btnBase} ${
+    isLight
+      ? 'bg-cyan-600 hover:bg-cyan-700 border-2 border-cyan-700 text-white font-mono font-black text-2xl sm:text-3xl shadow-md ring-1 ring-cyan-500/40'
+      : 'bg-cyan-500 hover:bg-cyan-400 border border-cyan-300 text-slate-950 font-mono font-black text-2xl sm:text-3xl shadow-md ring-1 ring-cyan-400/50'
+  }`;
+
+  // Function keys: Crisp contrast borders with subtle hover feedback
   const fnBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-slate-100 border-2 border-slate-300 text-slate-800 font-bold'
-      : 'bg-slate-900 border border-slate-750 text-slate-200 font-bold'
+      ? 'bg-stone-100 hover:bg-stone-50 border-2 border-stone-300 text-stone-800 font-bold shadow-2xs'
+      : 'bg-slate-900 hover:bg-slate-850 border border-slate-750 text-slate-200 font-bold'
   }`;
 
-  // Tax keys without hover effect
+  // Tax keys
   const taxBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-amber-50 border-2 border-amber-300 text-amber-950 font-bold'
-      : 'bg-amber-950/50 border border-amber-700/80 text-amber-300 font-bold'
+      ? 'bg-amber-100/80 hover:bg-amber-50 border-2 border-amber-300 text-amber-950 font-bold shadow-2xs'
+      : 'bg-amber-950/50 hover:bg-amber-900/60 border border-amber-700/80 text-amber-300 font-bold'
   }`;
 
-  // Memory keys without hover effect
+  // Memory keys
   const memBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-indigo-50 border-2 border-indigo-300 text-indigo-950 font-bold'
-      : 'bg-indigo-950/50 border border-indigo-700/80 text-indigo-300 font-bold'
+      ? 'bg-indigo-100/80 hover:bg-indigo-50 border-2 border-indigo-300 text-indigo-950 font-bold shadow-2xs'
+      : 'bg-indigo-950/50 hover:bg-indigo-900/60 border border-indigo-700/80 text-indigo-300 font-bold'
   }`;
 
-  // Clear keys without hover effect
+  // Clear keys with tactile bevel inset
   const clearBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-rose-50 border-2 border-rose-300 text-rose-950 font-bold'
-      : 'bg-rose-950/50 border border-rose-700/80 text-rose-300 font-bold'
+      ? 'bg-rose-100 hover:bg-rose-50 border-2 border-rose-300 text-rose-950 font-black key-bevel-clear-light shadow-2xs'
+      : 'bg-rose-950/60 hover:bg-rose-900/70 border border-rose-700/80 text-rose-200 font-bold key-bevel-clear-dark'
   }`;
 
-  // Enter / Calculate primary button without hover effect
+  // Enter / Calculate primary button with tactile bevel inset
   const enterBtn = `${btnBase} fluid-keypad-enter ${
     isLight
-      ? 'bg-emerald-600 text-white font-extrabold border-2 border-emerald-700'
-      : 'bg-emerald-600 text-white font-bold border border-emerald-500'
+      ? 'bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold border-2 border-emerald-700 key-bevel-enter-light shadow-md'
+      : 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold border border-emerald-500 key-bevel-enter-dark shadow-md'
   }`;
 
   return (
@@ -213,13 +220,13 @@ export const Keypad: React.FC<KeypadProps> = ({
         </button>
       </div>
 
-      {/* 3. Primary Keypad Grid */}
+      {/* 3. Primary Keypad Grid (Ergonomic 10-Key Layout with Tall + Accumulator and Tactile Nub on 5) */}
       <div className="grid grid-cols-5 gap-1 sm:gap-1.5 lg:gap-2">
         {/* Row 1: AC, CE, ⌫, (, ) */}
         <button
           id="btn-ac"
           onClick={onClearAll}
-          title="All Clear"
+          title="All Clear (Tactile Beveled)"
           className={`${clearBtn} ${activeKeyId === 'ac' ? 'ring-2 ring-rose-400 brightness-125' : ''}`}
         >
           <span>AC</span>
@@ -227,7 +234,7 @@ export const Keypad: React.FC<KeypadProps> = ({
         <button
           id="btn-ce"
           onClick={onClearEntry}
-          title="Clear Current Entry"
+          title="Clear Current Entry (Tactile Beveled)"
           className={`${clearBtn} ${activeKeyId === 'ce' ? 'ring-2 ring-rose-400 brightness-125' : ''}`}
         >
           <span>CE</span>
@@ -296,7 +303,7 @@ export const Keypad: React.FC<KeypadProps> = ({
           <Percent className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
 
-        {/* Row 3: 4, 5, 6, ×, +/- */}
+        {/* Row 3: 4, 5 (with tactile nub!), 6, ×, ST */}
         <button
           id="btn-4"
           onClick={() => onDigit('4')}
@@ -307,9 +314,13 @@ export const Keypad: React.FC<KeypadProps> = ({
         <button
           id="btn-5"
           onClick={() => onDigit('5')}
+          aria-label="5, homing key with tactile locator"
+          title="5 (Homing key with tactile locator nub)"
           className={`${numBtn} ${activeKeyId === '5' ? 'ring-2 ring-cyan-400 brightness-125' : ''}`}
         >
           <span>5</span>
+          {/* Classic 10-Key Tactile Raised Homing Nub */}
+          <span className={`tactile-nub-pip ${isLight ? 'tactile-nub-light' : 'tactile-nub-dark'}`} aria-hidden="true" />
         </button>
         <button
           id="btn-6"
@@ -327,15 +338,15 @@ export const Keypad: React.FC<KeypadProps> = ({
           <span>×</span>
         </button>
         <button
-          id="btn-sign"
-          onClick={onSignToggle}
-          title="Toggle Positive/Negative Sign (±)"
-          className={`${fnBtn} font-mono text-base sm:text-lg`}
+          id="btn-st"
+          onClick={onSubtotal}
+          title="Subtotal (ST)"
+          className={`${fnBtn} ${activeKeyId === 'st' ? 'ring-2 ring-indigo-400 brightness-125' : ''}`}
         >
-          <span>±</span>
+          <span>ST</span>
         </button>
 
-        {/* Row 4: 1, 2, 3, −, Subtotal */}
+        {/* Row 4: 1, 2, 3, −, and + (tall accumulator spanning rows 4 & 5!) */}
         <button
           id="btn-1"
           onClick={() => onDigit('1')}
@@ -365,16 +376,20 @@ export const Keypad: React.FC<KeypadProps> = ({
         >
           <span>−</span>
         </button>
+
+        {/* Tall Accumulator Plus Key (+) spanning 2 vertical rows (Rows 4 and 5) */}
         <button
-          id="btn-st"
-          onClick={onSubtotal}
-          title="Subtotal (ST)"
-          className={`${fnBtn} ${activeKeyId === 'st' ? 'ring-2 ring-indigo-400 brightness-125' : ''}`}
+          id="btn-plus"
+          onClick={() => onOperator('+')}
+          title="Add (+) – Primary 10-Key Accumulator"
+          className={`${plusAccumulatorBtn} row-span-2 col-start-5 flex items-center justify-center ${
+            activeKeyId === '+' ? 'ring-4 ring-cyan-300 brightness-125' : ''
+          }`}
         >
-          <span>ST</span>
+          <span className="text-2xl sm:text-3xl lg:text-4xl leading-none">+</span>
         </button>
 
-        {/* Row 5: 0, 00, ., +, GT */}
+        {/* Row 5: 0, 00, ., ± (Column 5 is occupied by tall +) */}
         <button
           id="btn-0"
           onClick={() => onDigit('0')}
@@ -399,34 +414,35 @@ export const Keypad: React.FC<KeypadProps> = ({
           <span>.</span>
         </button>
         <button
-          id="btn-plus"
-          onClick={() => onOperator('+')}
-          title="Add (+)"
-          className={`${opBtn} ${activeKeyId === '+' ? 'ring-2 ring-cyan-400 brightness-125' : ''}`}
+          id="btn-sign"
+          onClick={onSignToggle}
+          title="Toggle Positive/Negative Sign (±)"
+          className={`${fnBtn} font-mono text-base sm:text-lg`}
         >
-          <span>+</span>
+          <span>±</span>
         </button>
+      </div>
+
+      {/* 4. Large Primary Enter / Calculate Bar + Grand Total */}
+      <div className="grid grid-cols-5 gap-1 sm:gap-1.5 lg:gap-2 mt-0.5 sm:mt-1">
         <button
           id="btn-gt"
           onClick={onGrandTotal}
           title="Grand Total (GT)"
-          className={`${fnBtn} ${activeKeyId === 'gt' ? 'ring-2 ring-indigo-400 brightness-125' : ''}`}
+          className={`${fnBtn} col-span-1 py-2 sm:py-2.5 ${activeKeyId === 'gt' ? 'ring-2 ring-indigo-400 brightness-125' : ''}`}
         >
           <span>GT</span>
         </button>
-      </div>
 
-      {/* 4. Large Primary Enter / Calculate Bar */}
-      <div className="grid grid-cols-1 mt-0.5 sm:mt-1">
         <button
           id="btn-enter"
           onClick={onCalculate}
           title="Calculate Result (Enter or =)"
-          className={`${enterBtn} py-2.5 sm:py-3 lg:py-3.5 ${activeKeyId === 'enter' ? 'ring-4 ring-emerald-300 brightness-125' : ''}`}
+          className={`${enterBtn} col-span-4 py-2 sm:py-2.5 lg:py-3 ${activeKeyId === 'enter' ? 'ring-4 ring-emerald-300 brightness-125' : ''}`}
         >
           <div className="flex items-center justify-center gap-2">
             <Equal className="w-5 h-5 sm:w-6 sm:h-6 stroke-[3]" />
-            <span className="tracking-wider text-sm sm:text-base lg:text-lg font-black">ENTER / CALCULATE</span>
+            <span className="tracking-wider text-xs sm:text-sm lg:text-base font-black">ENTER / CALCULATE</span>
           </div>
         </button>
       </div>

@@ -119,7 +119,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
     setEditingNoteId(null);
   };
 
-  const handleCancelNote = (e?: React.MouseEvent) => {
+  const handleCancelNote = (e?: React.SyntheticEvent) => {
     if (e) e.stopPropagation();
     setEditingNoteId(null);
   };
@@ -315,7 +315,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
                   ? 'bg-cyan-600 border-cyan-600 text-white font-bold'
                   : 'bg-cyan-500/20 border-cyan-500 text-cyan-300 font-bold'
                 : isLight
-                ? 'bg-white border-slate-300 text-slate-900 hover:bg-slate-100 font-semibold'
+                ? 'bg-white border-stone-300 text-stone-900 hover:bg-stone-50 font-semibold'
                 : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
             }`}
           >
@@ -329,7 +329,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
             title="Copy all tape lines to clipboard"
             className={`flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md border text-[10px] sm:text-[11px] font-semibold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
               isLight
-                ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-900 font-bold'
+                ? 'bg-white hover:bg-stone-50 border-stone-300 text-stone-900 font-bold'
                 : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
             }`}
           >
@@ -691,12 +691,13 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
                             <Trash2 className="w-3 h-3" />
                           </button>
 
-                          <ArrowUpRight
-                            className={`w-3.5 h-3.5 opacity-70 group-hover:opacity-100 shrink-0 ${
-                              isLight ? 'text-cyan-700' : 'text-cyan-400'
-                            }`}
-                            title="Click to load into calculator"
-                          />
+                          <span title="Click to load into calculator">
+                            <ArrowUpRight
+                              className={`w-3.5 h-3.5 opacity-70 group-hover:opacity-100 shrink-0 ${
+                                isLight ? 'text-cyan-700' : 'text-cyan-400'
+                              }`}
+                            />
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -744,7 +745,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
                           title="Cancel (Escape)"
                           className={`px-2 py-1 text-xs font-medium rounded-lg border cursor-pointer transition-colors ${
                             isLight
-                              ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
+                              ? 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800'
                               : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
                           }`}
                         >
@@ -772,7 +773,7 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
             title="Scroll to most recent calculation"
             className={`absolute bottom-3 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer border ${
               isLight
-                ? 'bg-slate-900 text-white border-slate-700 hover:bg-slate-800'
+                ? 'bg-stone-900 text-white border-stone-700 hover:bg-stone-800'
                 : 'bg-cyan-500 text-slate-950 border-cyan-400 hover:bg-cyan-400'
             }`}
           >
@@ -785,11 +786,11 @@ export const TapeHistory: React.FC<TapeHistoryProps> = ({
       {/* Tape Footer with Clear & Export shortcuts */}
       <div
         className={`flex flex-wrap items-center justify-between gap-1.5 p-2 sm:p-2.5 border-t text-xs ${
-          isLight ? 'border-slate-300 bg-white' : 'border-slate-800 bg-slate-950/30'
+          isLight ? 'border-stone-300 bg-[#f5f3ef]' : 'border-slate-800 bg-slate-950/30'
         }`}
       >
         <div className="flex items-center gap-1.5">
-          <span className={`text-[10px] sm:text-[11px] font-bold ${isLight ? 'text-slate-800' : 'text-slate-300'}`}>
+          <span className={`text-[10px] sm:text-[11px] font-bold ${isLight ? 'text-stone-900' : 'text-slate-300'}`}>
             {records.length} items recorded
           </span>
         </div>

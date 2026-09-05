@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { CalculatorSettings, AppTheme, NumberFormatType, DateFormatType, WorkspaceLayout } from '../types';
 import {
   X,
@@ -15,9 +15,12 @@ import {
   LayoutGrid,
   Sparkles,
   CheckCircle2,
+  Download,
+  Upload,
+  ShieldCheck,
 } from 'lucide-react';
 import { playKeySound } from '../utils/audio';
-import { DEFAULT_SETTINGS } from '../utils/storage';
+import { DEFAULT_SETTINGS, WorkspaceBackupData, downloadWorkspaceBackup, restoreWorkspaceBackup } from '../utils/storage';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -25,6 +28,7 @@ interface SettingsModalProps {
   settings: CalculatorSettings;
   onUpdateSettings: (newSettings: Partial<CalculatorSettings>) => void;
   onResetDefaults: () => void;
+  onRestoreWorkspace?: (backup: WorkspaceBackupData) => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -33,7 +37,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   settings,
   onUpdateSettings,
   onResetDefaults,
+  onRestoreWorkspace,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [restoreStatus, setRestoreStatus] = useState<{ message: string; isError: boolean } | null>(null);
+
   if (!isOpen) return null;
 
   const isLight = settings.theme === 'light';
@@ -42,27 +50,61 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     playKeySound('enter', settings.soundVolume);
   };
 
+  const handleExportBackup = () => {
+    playKeySound('action', settings.soundVolume);
+    downloadWorkspaceBackup();
+  };
+
+  const handleFileRestore = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (!text) return;
+
+      const result = restoreWorkspaceBackup(text);
+      if (result.success && result.data) {
+        setRestoreStatus({ message: result.message, isError: false });
+        playKeySound('enter', settings.soundVolume);
+        if (onRestoreWorkspace) {
+          onRestoreWorkspace(result.data);
+        } else {
+          onUpdateSettings(result.data.settings);
+        }
+      } else {
+        setRestoreStatus({ message: result.message || 'Failed to restore backup.', isError: true });
+      }
+    };
+    reader.readAsText(file);
+    // Reset file input so user can pick again if needed
+    e.target.value = '';
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
       <div
         id="settings-modal-dialog"
         className={`w-full max-w-xl max-h-[90vh] flex flex-col rounded-2xl border shadow-2xl overflow-hidden transition-all ${
-          isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-900 border-slate-800 text-slate-100'
+          isLight ? 'bg-[#fcfbf9] border-stone-300 text-stone-900' : 'bg-slate-900 border-slate-800 text-slate-100'
         }`}
       >
         {/* Modal Header */}
         <div
           className={`flex items-center justify-between px-6 py-4 border-b ${
-            isLight ? 'border-slate-200 bg-slate-50' : 'border-slate-800 bg-slate-950/60'
+            isLight ? 'border-stone-200 bg-[#f5f3ef]' : 'border-slate-800 bg-slate-950/60'
           }`}
         >
           <div className="flex items-center gap-2">
-            <Palette className="w-5 h-5 text-cyan-500" />
+            <Palette className="w-5 h-5 text-cyan-600 dark:text-cyan-500" />
             <h2 className="text-base font-bold tracking-tight">Calculator Preferences & Settings</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-slate-700/20 text-slate-400 hover:text-slate-100 transition-colors cursor-pointer"
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+              isLight ? 'hover:bg-stone-200 text-stone-500 hover:text-stone-900' : 'hover:bg-slate-700/20 text-slate-400 hover:text-slate-100'
+            }`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -71,13 +113,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 text-sm" style={{ scrollbarWidth: 'thin' }}>
           {/* Quick Accounting Presets */}
-          <div className="p-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 space-y-2.5">
+          <div className={`p-4 rounded-xl border space-y-2.5 ${
+            isLight ? 'border-cyan-300 bg-cyan-50/50' : 'border-cyan-500/30 bg-cyan-950/20'
+          }`}>
             <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 font-bold text-xs text-cyan-400">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+              <span className="flex items-center gap-1.5 font-bold text-xs text-cyan-700 dark:text-cyan-400">
+                <Sparkles className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                 <span>1-Click Accounting & Currency Presets</span>
               </span>
-              <span className="text-[11px] text-slate-400">Instant configuration</span>
+              <span className={`text-[11px] ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>Instant configuration</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
@@ -88,14 +132,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }}
                 className={`p-2 rounded-lg border text-left text-xs transition-all cursor-pointer ${
                   settings.decimalPlaces === 2 && settings.numberFormat === 'comma_dot'
-                    ? 'border-cyan-500 bg-cyan-500/15 font-bold text-cyan-300'
+                    ? isLight ? 'border-cyan-600 bg-cyan-100 font-bold text-cyan-950 shadow-xs' : 'border-cyan-500 bg-cyan-500/15 font-bold text-cyan-300'
                     : isLight
-                    ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
+                    ? 'border-stone-300 bg-white hover:bg-stone-50 text-stone-900'
                     : 'border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-200'
                 }`}
               >
                 <p className="font-bold text-[11px]">🏢 Standard Finance</p>
-                <p className="text-[10px] text-slate-400 mt-0.5">2 Dec • 1,234.56 • 15%</p>
+                <p className={`text-[10px] mt-0.5 ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>2 Dec • 1,234.56 • 15%</p>
               </button>
 
               <button
@@ -106,14 +150,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }}
                 className={`p-2 rounded-lg border text-left text-xs transition-all cursor-pointer ${
                   settings.decimalPlaces === 0 && settings.numberFormat === 'comma_dot'
-                    ? 'border-cyan-500 bg-cyan-500/15 font-bold text-cyan-300'
+                    ? isLight ? 'border-cyan-600 bg-cyan-100 font-bold text-cyan-950 shadow-xs' : 'border-cyan-500 bg-cyan-500/15 font-bold text-cyan-300'
                     : isLight
-                    ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
+                    ? 'border-stone-300 bg-white hover:bg-stone-50 text-stone-900'
                     : 'border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-200'
                 }`}
               >
                 <p className="font-bold text-[11px]">💵 Cash & Whole</p>
-                <p className="text-[10px] text-slate-400 mt-0.5">0 Dec • 1,234 • 0%</p>
+                <p className={`text-[10px] mt-0.5 ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>0 Dec • 1,234 • 0%</p>
               </button>
 
               <button
@@ -124,14 +168,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }}
                 className={`p-2 rounded-lg border text-left text-xs transition-all cursor-pointer ${
                   settings.decimalPlaces === 4 && settings.numberFormat === 'comma_dot'
-                    ? 'border-cyan-500 bg-cyan-500/15 font-bold text-cyan-300'
+                    ? isLight ? 'border-cyan-600 bg-cyan-100 font-bold text-cyan-950 shadow-xs' : 'border-cyan-500 bg-cyan-500/15 font-bold text-cyan-300'
                     : isLight
-                    ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
+                    ? 'border-stone-300 bg-white hover:bg-stone-50 text-stone-900'
                     : 'border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-200'
                 }`}
               >
                 <p className="font-bold text-[11px]">🔬 High-Precision</p>
-                <p className="text-[10px] text-slate-400 mt-0.5">4 Dec • 1,234.5678</p>
+                <p className={`text-[10px] mt-0.5 ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>4 Dec • 1,234.5678</p>
               </button>
 
               <button
@@ -142,14 +186,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }}
                 className={`p-2 rounded-lg border text-left text-xs transition-all cursor-pointer ${
                   settings.decimalPlaces === 2 && settings.numberFormat === 'dot_comma'
-                    ? 'border-cyan-500 bg-cyan-500/15 font-bold text-cyan-300'
+                    ? isLight ? 'border-cyan-600 bg-cyan-100 font-bold text-cyan-950 shadow-xs' : 'border-cyan-500 bg-cyan-500/15 font-bold text-cyan-300'
                     : isLight
-                    ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
+                    ? 'border-stone-300 bg-white hover:bg-stone-50 text-stone-900'
                     : 'border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-200'
                 }`}
               >
                 <p className="font-bold text-[11px]">🇪🇺 European Standard</p>
-                <p className="text-[10px] text-slate-400 mt-0.5">2 Dec • 1.234,56 • 20%</p>
+                <p className={`text-[10px] mt-0.5 ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>2 Dec • 1.234,56 • 20%</p>
               </button>
             </div>
           </div>
@@ -443,7 +487,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="flex items-center gap-2 font-bold mb-2">
-                <Hash className="w-4 h-4 text-cyan-500" />
+                <Hash className="w-4 h-4 text-cyan-600 dark:text-cyan-500" />
                 <span>3-Digit Separator Format</span>
               </label>
               <select
@@ -451,7 +495,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onChange={(e) => onUpdateSettings({ numberFormat: e.target.value as NumberFormatType })}
                 className={`w-full p-2.5 rounded-xl border font-mono text-xs outline-none cursor-pointer ${
                   isLight
-                    ? 'bg-slate-50 border-slate-300 text-slate-900'
+                    ? 'bg-white border-stone-300 text-stone-900 shadow-2xs'
                     : 'bg-slate-800 border-slate-700 text-slate-100'
                 }`}
               >
@@ -464,7 +508,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <div>
               <label className="flex items-center gap-2 font-bold mb-2">
-                <Percent className="w-4 h-4 text-cyan-500" />
+                <Percent className="w-4 h-4 text-cyan-600 dark:text-cyan-500" />
                 <span>Default Decimal Precision</span>
               </label>
               <div className="flex items-center gap-2">
@@ -474,9 +518,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   max="8"
                   value={settings.decimalPlaces}
                   onChange={(e) => onUpdateSettings({ decimalPlaces: parseInt(e.target.value) })}
-                  className="flex-1 accent-cyan-500 cursor-pointer"
+                  className="flex-1 accent-cyan-600 cursor-pointer"
                 />
-                <span className="font-mono font-bold text-base px-3 py-1 rounded-lg border bg-slate-800/40 text-cyan-400">
+                <span className={`font-mono font-bold text-base px-3 py-1 rounded-lg border ${
+                  isLight ? 'bg-stone-100 border-stone-300 text-cyan-800' : 'bg-slate-800/40 border-slate-700 text-cyan-400'
+                }`}>
                   {settings.decimalPlaces}
                 </span>
               </div>
@@ -485,15 +531,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* 3. Audio / Click Confirmation */}
           <div className={`p-4 rounded-xl border space-y-3 ${
-            isLight ? 'border-slate-300 bg-slate-100/70' : 'border-slate-700/50 bg-slate-800/20'
+            isLight ? 'border-stone-300 bg-[#f5f3ef]' : 'border-slate-700/50 bg-slate-800/20'
           }`}>
             <div className="flex items-center justify-between">
               <div>
                 <label className="flex items-center gap-2 font-bold cursor-pointer text-sm">
-                  <Volume2 className="w-4 h-4 text-cyan-500" />
+                  <Volume2 className="w-4 h-4 text-cyan-600 dark:text-cyan-500" />
                   <span>Sound Confirmation</span>
                 </label>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className={`text-[11px] mt-0.5 ${isLight ? 'text-stone-600' : 'text-slate-400'}`}>
                   Plays audio feedback strictly on Enter / Calculate key presses.
                 </p>
               </div>
@@ -501,13 +547,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="checkbox"
                 checked={settings.soundEnabled}
                 onChange={(e) => onUpdateSettings({ soundEnabled: e.target.checked })}
-                className="w-4 h-4 accent-cyan-500 cursor-pointer"
+                className="w-4 h-4 accent-cyan-600 cursor-pointer"
               />
             </div>
 
             {settings.soundEnabled && (
               <div className="flex items-center gap-3 pt-1">
-                <span className="text-xs text-slate-400">Volume:</span>
+                <span className={`text-xs ${isLight ? 'text-stone-600' : 'text-slate-400'}`}>Volume:</span>
                 <input
                   type="range"
                   min="0.1"
@@ -515,11 +561,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   step="0.05"
                   value={settings.soundVolume}
                   onChange={(e) => onUpdateSettings({ soundVolume: parseFloat(e.target.value) })}
-                  className="flex-1 accent-cyan-500 cursor-pointer"
+                  className="flex-1 accent-cyan-600 cursor-pointer"
                 />
                 <button
                   onClick={handleTestSound}
-                  className="px-2.5 py-1 text-xs font-semibold rounded-md border border-cyan-700 bg-cyan-950/50 text-cyan-300 hover:bg-cyan-900/60 cursor-pointer"
+                  className={`px-2.5 py-1 text-xs font-semibold rounded-md border cursor-pointer ${
+                    isLight
+                      ? 'border-cyan-400 bg-cyan-100 text-cyan-950 hover:bg-cyan-200'
+                      : 'border-cyan-700 bg-cyan-950/50 text-cyan-300 hover:bg-cyan-900/60'
+                  }`}
                 >
                   Test Enter Sound
                 </button>
@@ -531,7 +581,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="flex items-center gap-2 font-bold mb-2">
-                <Percent className="w-4 h-4 text-amber-500" />
+                <Percent className="w-4 h-4 text-amber-600 dark:text-amber-500" />
                 <span>Default Tax Rate (%)</span>
               </label>
               <div className="relative">
@@ -544,17 +594,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onChange={(e) => onUpdateSettings({ taxRate: parseFloat(e.target.value) || 0 })}
                   className={`w-full p-2.5 rounded-xl border font-mono text-sm outline-none ${
                     isLight
-                      ? 'bg-slate-50 border-slate-300 text-slate-900'
+                      ? 'bg-white border-stone-300 text-stone-900 shadow-2xs'
                       : 'bg-slate-800 border-slate-700 text-slate-100'
                   }`}
                 />
-                <span className="absolute right-3 top-2.5 font-bold text-slate-400">%</span>
+                <span className={`absolute right-3 top-2.5 font-bold ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>%</span>
               </div>
             </div>
 
             <div>
               <label className="flex items-center gap-2 font-bold mb-2">
-                <Clock className="w-4 h-4 text-cyan-500" />
+                <Clock className="w-4 h-4 text-cyan-600 dark:text-cyan-500" />
                 <span>Date Display Format</span>
               </label>
               <select
@@ -562,7 +612,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onChange={(e) => onUpdateSettings({ dateFormat: e.target.value as DateFormatType })}
                 className={`w-full p-2.5 rounded-xl border text-xs outline-none cursor-pointer ${
                   isLight
-                    ? 'bg-slate-50 border-slate-300 text-slate-900'
+                    ? 'bg-white border-stone-300 text-stone-900 shadow-2xs'
                     : 'bg-slate-800 border-slate-700 text-slate-100'
                 }`}
               >
@@ -574,13 +624,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Organization & Operator Metadata */}
-          <div className="space-y-3 pt-2 border-t border-slate-800/40">
-            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">
+          <div className={`space-y-3 pt-2 border-t ${isLight ? 'border-stone-200' : 'border-slate-800/40'}`}>
+            <h3 className={`font-bold text-xs uppercase tracking-wider ${isLight ? 'text-stone-600' : 'text-slate-400'}`}>
               Report & Organization Header
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
+                <label className={`flex items-center gap-1.5 text-xs mb-1 ${isLight ? 'text-stone-600' : 'text-slate-400'}`}>
                   <Building2 className="w-3.5 h-3.5" /> Company / Organization
                 </label>
                 <input
@@ -589,7 +639,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onChange={(e) => onUpdateSettings({ companyName: e.target.value })}
                   className={`w-full p-2 rounded-lg border text-xs outline-none ${
                     isLight
-                      ? 'bg-slate-50 border-slate-300 text-slate-900'
+                      ? 'bg-white border-stone-300 text-stone-900 shadow-2xs'
                       : 'bg-slate-800 border-slate-700 text-slate-100'
                   }`}
                 />
@@ -605,12 +655,75 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onChange={(e) => onUpdateSettings({ operatorName: e.target.value })}
                   className={`w-full p-2 rounded-lg border text-xs outline-none ${
                     isLight
-                      ? 'bg-slate-50 border-slate-300 text-slate-900'
+                      ? 'bg-stone-50 border-stone-300 text-stone-900'
                       : 'bg-slate-800 border-slate-700 text-slate-100'
                   }`}
                 />
               </div>
             </div>
+          </div>
+
+          {/* Zero-Maintenance Workspace Backup & Restore (JSON) */}
+          <div className={`p-4 rounded-xl border space-y-3 ${
+            isLight ? 'bg-[#f5f3ef] border-stone-300 text-stone-900' : 'bg-slate-950/60 border-slate-800 text-slate-100'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-1.5 font-bold text-xs sm:text-sm text-cyan-600 dark:text-cyan-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Workspace Backup & Disaster Recovery</span>
+                </div>
+                <p className={`text-[11px] mt-0.5 ${isLight ? 'text-stone-600' : 'text-slate-400'}`}>
+                  Export full audit tape records, tax configurations, and company headers to an offline, portable JSON file.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              <button
+                id="export-workspace-backup-btn"
+                type="button"
+                onClick={handleExportBackup}
+                className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-700 text-white shadow-xs transition-all cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>Export Backup (.json)</span>
+              </button>
+
+              <button
+                id="restore-workspace-backup-btn"
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={`flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                  isLight
+                    ? 'bg-white hover:bg-stone-50 border-stone-300 text-stone-800 shadow-2xs'
+                    : 'bg-slate-800 hover:bg-slate-750 border-slate-700 text-slate-200'
+                }`}
+              >
+                <Upload className="w-4 h-4 text-cyan-500" />
+                <span>Restore Backup (.json)</span>
+              </button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                className="hidden"
+                onChange={handleFileRestore}
+              />
+            </div>
+
+            {restoreStatus && (
+              <div
+                className={`p-2.5 rounded-lg text-xs font-medium transition-all ${
+                  restoreStatus.isError
+                    ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                    : 'bg-emerald-100 text-emerald-950 border border-emerald-300'
+                }`}
+              >
+                {restoreStatus.message}
+              </div>
+            )}
           </div>
         </div>
 

@@ -77,7 +77,7 @@ export function exportTapeToExcel(
     ['Maximum Value', maxVal],
     ['Minimum Value', minVal],
     [],
-    ['FOOTER SIGNATURE:', 'IOOC-ShirazOffice | By: N.Shaaeri'],
+    ['FOOTER SIGNATURE:', 'IOOC-ShirazOffice | Developed by: N.Shaaeri/A.Kanani'],
   ];
 
   const fullSheetData = [...headerRows, ...dataRows, ...summaryRows];

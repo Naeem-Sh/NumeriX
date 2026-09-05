@@ -152,13 +152,11 @@ export function generatePdfReport(
     });
     const avg = records.length > 0 ? sum / records.length : 0;
 
-    if (!isInkSaver) {
-      doc.setFillColor(248, 250, 252);
-      doc.roundedRect(margin, startY, pageWidth - margin * 2, 15, 2, 2, 'F');
-    } else {
-      doc.setDrawColor(203, 213, 225);
-      doc.roundedRect(margin, startY, pageWidth - margin * 2, 15, 1, 1, 'S');
-    }
+    // Pure white summary box with clean border
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margin, startY, pageWidth - margin * 2, 15, 1.5, 1.5, 'FD');
 
     doc.setFontSize(7.5);
     doc.setTextColor(100, 116, 139);
@@ -212,9 +210,12 @@ export function generatePdfReport(
     head: [tableHead],
     body: tableData,
     margin: { left: margin, right: margin, bottom: 20 },
-    theme: isInkSaver ? 'plain' : 'striped',
+    theme: 'plain',
+    alternateRowStyles: {
+      fillColor: [255, 255, 255],
+    },
     headStyles: {
-      fillColor: isGrayscale || isInkSaver ? [51, 65, 85] : [30, 41, 59], // Slate
+      fillColor: isGrayscale || isInkSaver ? [51, 65, 85] : [15, 23, 42], // Slate 900
       textColor: [255, 255, 255],
       fontStyle: 'bold',
       fontSize: fontSize,
@@ -224,10 +225,11 @@ export function generatePdfReport(
     styles: {
       font: 'courier',
       fontSize: fontSize,
-      textColor: [30, 41, 59],
+      textColor: [15, 23, 42],
       cellPadding: padding,
       lineColor: [226, 232, 240],
       lineWidth: 0.1,
+      fillColor: [255, 255, 255],
     },
     columnStyles: {
       ...(showLines ? { 0: { cellWidth: 10, halign: 'center' } } : {}),
@@ -243,7 +245,7 @@ export function generatePdfReport(
       doc.setTextColor(100, 116, 139);
 
       // Left footer
-      doc.text('IOOC-ShirazOffice  |  By: N.Shaaeri', margin, pageHeight - 8);
+      doc.text('IOOC-ShirazOffice  |  Developed by: N.Shaaeri/A.Kanani', margin, pageHeight - 8);
 
       // Right footer page number
       if (customOptions?.showPageNumbers !== false) {

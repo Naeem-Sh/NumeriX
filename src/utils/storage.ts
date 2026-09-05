@@ -87,3 +87,87 @@ export function saveStoredLogo(logoDataUrl: string | null): void {
     console.error('Failed to save logo to localStorage', e);
   }
 }
+
+export interface WorkspaceBackupData {
+  version: string;
+  exportedAt: string;
+  app: string;
+  settings: CalculatorSettings;
+  tape: CalculationRecord[];
+  logo: string | null;
+}
+
+export function createWorkspaceBackup(): WorkspaceBackupData {
+  return {
+    version: '1.2.0',
+    exportedAt: new Date().toISOString(),
+    app: 'NumeriX Financial Calculator',
+    settings: loadStoredSettings(),
+    tape: loadStoredTape(),
+    logo: loadStoredLogo(),
+  };
+}
+
+export function downloadWorkspaceBackup(): void {
+  try {
+    const backup = createWorkspaceBackup();
+    const jsonString = JSON.stringify(backup, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStr = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `numerix-workspace-backup-${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error('Failed to export workspace backup:', err);
+  }
+}
+
+export function restoreWorkspaceBackup(jsonText: string): { success: boolean; message: string; data?: WorkspaceBackupData } {
+  try {
+    const parsed = JSON.parse(jsonText);
+    if (!parsed || typeof parsed !== 'object') {
+      return { success: false, message: 'Invalid JSON file structure.' };
+    }
+
+    // Validate settings or fallback
+    const rawSettings = parsed.settings && typeof parsed.settings === 'object' ? parsed.settings : {};
+    const mergedSettings: CalculatorSettings = {
+      ...DEFAULT_SETTINGS,
+      ...rawSettings,
+    };
+
+    // Validate tape records
+    const rawTape = Array.isArray(parsed.tape) ? parsed.tape : [];
+    const validTape: CalculationRecord[] = rawTape.filter(
+      (item: unknown): item is CalculationRecord =>
+        Boolean(item && typeof item === 'object' && 'id' in item && 'result' in item)
+    );
+
+    const logo = typeof parsed.logo === 'string' ? parsed.logo : null;
+
+    // Persist restored elements
+    saveStoredSettings(mergedSettings);
+    saveStoredTape(validTape);
+    saveStoredLogo(logo);
+
+    return {
+      success: true,
+      message: `Successfully restored ${validTape.length} audit records and preferences.`,
+      data: {
+        version: parsed.version || '1.0.0',
+        exportedAt: parsed.exportedAt || new Date().toISOString(),
+        app: parsed.app || 'NumeriX',
+        settings: mergedSettings,
+        tape: validTape,
+        logo,
+      },
+    };
+  } catch (err) {
+    return { success: false, message: `Could not parse JSON backup: ${(err as Error).message}` };
+  }
+}

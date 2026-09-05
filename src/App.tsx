@@ -1445,7 +1445,7 @@ export default function App() {
             <span>IOOC-ShirazOffice</span>
           </div>
           <div className="font-medium opacity-75">
-            By: N.Shaaeri/A.Kanani
+            Developed by: N.Shaaeri/A.Kanani
           </div>
         </div>
       </footer>
@@ -1462,6 +1462,13 @@ export default function App() {
           setSettings((prev) => ({ ...prev, ...newVals }));
         }}
         onResetDefaults={handleResetDefaults}
+        onRestoreWorkspace={(backup) => {
+          setSettings(backup.settings);
+          setTapeRecords(backup.tape);
+          if (backup.logo !== undefined) {
+            saveStoredLogo(backup.logo);
+          }
+        }}
       />
 
       <HelpModal

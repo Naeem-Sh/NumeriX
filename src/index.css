@@ -153,29 +153,82 @@
 .keycap-light-sculpted {
   position: relative;
   transition: transform 0.06s ease, box-shadow 0.06s ease;
-  box-shadow: 0 3px 0 0 #cbd5e1, 0 4px 5px -1px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 0 0 #a8a29e, 0 4px 6px -1px rgba(0, 0, 0, 0.09);
 }
 
 .keycap-light-sculpted:active {
   transform: translateY(2px);
-  box-shadow: 0 1px 0 0 #cbd5e1, 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 0 0 #a8a29e, 0 1px 2px 0 rgba(0, 0, 0, 0.07);
 }
 
-/* Exclusive Tactile Hover Effect for Number Keys (0, 1, 2, ..., 9) */
-.fluid-keypad-num {
-  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+/* 10-Key Tactile Homing Nub on '5' Key for physical touch-typing */
+.tactile-nub-pip {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 3px;
+  border-radius: 9999px;
+  pointer-events: none;
 }
 
-.keycap-sculpted.fluid-keypad-num:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 0 rgba(0, 0, 0, 0.45), 0 8px 14px -1px rgba(6, 182, 212, 0.3);
+.tactile-nub-dark {
+  background: rgba(148, 163, 184, 0.7);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.tactile-nub-light {
+  background: #78716c;
+  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Tactile Bevel Inset on Clear (AC / CE) Keys */
+.key-bevel-clear-dark {
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.35), 0 3px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+.key-bevel-clear-light {
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), inset 0 -2px 3px rgba(225, 29, 72, 0.18), 0 3px 0 0 #fda4af;
+}
+
+/* Tactile Bevel Inset on Total / Enter Key */
+.key-bevel-enter-dark {
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25), inset 0 -2px 5px rgba(0, 0, 0, 0.45), 0 3px 0 0 #064e3b;
+}
+
+.key-bevel-enter-light {
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), inset 0 -2px 4px rgba(0, 0, 0, 0.25), 0 3px 0 0 #047857;
+}
+
+/* Subtle Glowing Border Hover Effect Across All Keypad Buttons */
+.fluid-keypad-btn {
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.14s ease,
+              background-color 0.12s ease,
+              border-color 0.14s ease,
+              color 0.12s ease;
+}
+
+/* Dark Mode: Electric cyan primary accent glow */
+.keycap-sculpted:hover {
   border-color: rgba(6, 182, 212, 0.75);
+  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.4),
+              0 0 12px 1px rgba(6, 182, 212, 0.32),
+              0 6px 16px -2px rgba(6, 182, 212, 0.2);
 }
 
-.keycap-light-sculpted.fluid-keypad-num:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 0 #94a3b8, 0 8px 14px -1px rgba(14, 165, 233, 0.25);
+/* Light Mode: Vibrant cyan/sky primary accent glow */
+.keycap-light-sculpted:hover {
   border-color: #0284c7;
+  box-shadow: 0 4px 0 0 #94a3b8,
+              0 0 10px 1px rgba(14, 165, 233, 0.3),
+              0 6px 14px -2px rgba(14, 165, 233, 0.2);
+}
+
+/* Slight lift on hover for digit keys */
+.fluid-keypad-num:hover {
+  transform: translateY(-2px);
 }
 
 /* Authentic Continuous Paper Feed Perforations */
@@ -196,7 +249,7 @@
 }
 
 /* =========================================================================
-   Print Media Styles for Crisp Physical & PDF Output (Top-Aligned & Clean)
+   Print Media Styles for Crisp Physical & PDF Output (Top-Aligned & Pure White)
    ========================================================================= */
 @media print {
   @page {
@@ -204,20 +257,50 @@
     size: auto;
   }
 
-  /* Reset document root to eliminate any default browser overflow or offsets */
-  html, body, #root {
-    background: #ffffff !important;
-    color: #0f172a !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    position: static !important;
-    transform: none !important;
+  /* Strip all shadows, glows, and filters */
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+  }
+
+  /* Reset document root & app root containers to pure white */
+  html,
+  body,
+  #root,
+  #app-root-container,
+  #print-preview-modal-backdrop,
+  #print-preview-modal,
+  #print-modal-body,
+  #print-preview-canvas-container,
+  #print-sheet-stage,
+  #print-sheet-paper,
+  #printable-report-area {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: static !important;
+    border: none !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+  }
+
+  /* Force all children inside the printable report area to have white background */
+  #printable-report-area,
+  #printable-report-area * {
+    background-color: #ffffff !important;
+    background-image: none !important;
   }
 
   /* Hide the underlying calculator app workstation, header, and footer completely */
@@ -226,115 +309,38 @@
   #app-footer-bar,
   #settings-modal-backdrop,
   #help-modal-backdrop,
+  #print-modal-header,
+  #print-modal-sidebar,
+  #print-preview-toolbar,
   .no-print,
   .print-hidden {
     display: none !important;
-  }
-
-  /* Reset the print preview modal backdrop so it flows naturally from the top of page 1 */
-  #print-preview-modal-backdrop {
-    position: static !important;
-    inset: auto !important;
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    overflow: visible !important;
-    box-shadow: none !important;
-    border: none !important;
-  }
-
-  /* Reset modal box */
-  #print-preview-modal {
-    position: static !important;
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    transform: none !important;
-    overflow: visible !important;
-  }
-
-  /* Hide interactive controls inside the modal (Header, Sidebar settings, Zoom bar) */
-  #print-modal-header,
-  #print-modal-sidebar,
-  #print-preview-toolbar {
-    display: none !important;
-  }
-
-  /* Reset canvas & stage containers so content starts at top-left 0,0 */
-  #print-modal-body,
-  #print-preview-canvas-container,
-  #print-sheet-stage {
-    position: static !important;
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    overflow: visible !important;
-  }
-
-  /* Reset the simulated paper preview wrapper */
-  #print-sheet-paper {
-    position: static !important;
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    border: none !important;
-    border-radius: 0 !important;
-    transform: none !important;
-    background: transparent !important;
-    color: #0f172a !important;
-    overflow: visible !important;
-  }
-
-  /* Printable Report Area - Direct clean flow */
-  #printable-report-area {
-    position: static !important;
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    color: #0f172a !important;
-    box-shadow: none !important;
-    border: none !important;
-    overflow: visible !important;
   }
 
   /* Table formatting and pagination handling */
   table {
     width: 100% !important;
     border-collapse: collapse !important;
+    background-color: #ffffff !important;
   }
 
   thead {
     display: table-header-group !important;
+    background-color: #ffffff !important;
+  }
+
+  tbody {
+    background-color: #ffffff !important;
   }
 
   tr {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
+    background-color: #ffffff !important;
+  }
+
+  th, td {
+    background-color: #ffffff !important;
   }
 
   .page-break-inside-avoid {
