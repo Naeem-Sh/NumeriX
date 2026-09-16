@@ -110,23 +110,26 @@
    ========================================================================= */
 .shader-vfd-emerald {
   color: #34d399;
-  text-shadow: 0 0 12px rgba(52, 211, 153, 0.65), 0 0 24px rgba(16, 185, 129, 0.35);
-  background: radial-gradient(circle at center, #022c22 0%, #031713 70%, #020b08 100%);
-  border-color: #065f46;
+  text-shadow: 0 0 12px rgba(52, 211, 153, 0.5), 0 0 24px rgba(16, 185, 129, 0.25);
+  background: radial-gradient(circle at center, #031a14 0%, #02120e 70%, #010907 100%);
+  border-color: rgba(6, 95, 70, 0.5);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.65);
 }
 
 .shader-amber-glow {
   color: #fbbf24;
-  text-shadow: 0 0 12px rgba(251, 191, 36, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
-  background: radial-gradient(circle at center, #2e1065/0 0%, #261205 70%, #150902 100%);
-  border-color: #78350f;
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.5), 0 0 24px rgba(245, 158, 11, 0.3);
+  background: radial-gradient(circle at center, #1c0e04 0%, #130902 70%, #0a0401 100%);
+  border-color: rgba(120, 53, 15, 0.5);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.65);
 }
 
 .shader-oled-ice {
   color: #f8fafc;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 0 0 16px rgba(56, 189, 248, 0.3);
-  background: radial-gradient(circle at center, #0f172a 0%, #050b14 70%, #020408 100%);
-  border-color: #1e293b;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(56, 189, 248, 0.25);
+  background: radial-gradient(circle at center, #0b111c 0%, #060a10 70%, #030508 100%);
+  border-color: rgba(30, 41, 59, 0.6);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.65);
 }
 
 .shader-classic-lcd {
@@ -134,31 +137,46 @@
   text-shadow: none;
   background: #cbd5e1;
   border-color: #94a3b8;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 /* =========================================================================
-   Sculpted 3D Keycap Physics & Key Touch Shadows
+   Neomodern Keycap Styling (Flat, soft-matte with subtle 1px elevation)
    ========================================================================= */
-.keycap-sculpted {
+.keycap-neomodern {
   position: relative;
-  transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.06s ease;
-  box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.35), 0 5px 6px -1px rgba(0, 0, 0, 0.2);
+  transition: transform 0.08s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.08s ease,
+              background-color 0.12s ease,
+              border-color 0.12s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
 }
 
-.keycap-sculpted:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.35), 0 2px 3px -1px rgba(0, 0, 0, 0.2);
+.keycap-neomodern:hover {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
 }
 
-.keycap-light-sculpted {
+.keycap-neomodern:active {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.keycap-neomodern-light {
   position: relative;
-  transition: transform 0.06s ease, box-shadow 0.06s ease;
-  box-shadow: 0 3px 0 0 #a8a29e, 0 4px 6px -1px rgba(0, 0, 0, 0.09);
+  transition: transform 0.08s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.08s ease,
+              background-color 0.12s ease,
+              border-color 0.12s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-.keycap-light-sculpted:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 0 #a8a29e, 0 1px 2px 0 rgba(0, 0, 0, 0.07);
+.keycap-neomodern-light:hover {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.09);
+}
+
+.keycap-neomodern-light:active {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
 /* 10-Key Tactile Homing Nub on '5' Key for physical touch-typing */
@@ -168,67 +186,41 @@
   left: 50%;
   transform: translateX(-50%);
   width: 14px;
-  height: 3px;
+  height: 2.5px;
   border-radius: 9999px;
   pointer-events: none;
 }
 
 .tactile-nub-dark {
-  background: rgba(148, 163, 184, 0.7);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  background: rgba(148, 163, 184, 0.6);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 
 .tactile-nub-light {
-  background: #78716c;
-  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 1px 0 rgba(0, 0, 0, 0.2);
+  background: #a8a29e;
+  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
-/* Tactile Bevel Inset on Clear (AC / CE) Keys */
-.key-bevel-clear-dark {
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.35), 0 3px 0 0 rgba(0, 0, 0, 0.4);
-}
-
-.key-bevel-clear-light {
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), inset 0 -2px 3px rgba(225, 29, 72, 0.18), 0 3px 0 0 #fda4af;
-}
-
-/* Tactile Bevel Inset on Total / Enter Key */
-.key-bevel-enter-dark {
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25), inset 0 -2px 5px rgba(0, 0, 0, 0.45), 0 3px 0 0 #064e3b;
-}
-
-.key-bevel-enter-light {
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), inset 0 -2px 4px rgba(0, 0, 0, 0.25), 0 3px 0 0 #047857;
-}
-
-/* Subtle Glowing Border Hover Effect Across All Keypad Buttons */
+/* Subtle Hover Effect Across Keypad Buttons */
 .fluid-keypad-btn {
-  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.14s ease,
+  transition: transform 0.08s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.08s ease,
               background-color 0.12s ease,
-              border-color 0.14s ease,
+              border-color 0.12s ease,
               color 0.12s ease;
 }
 
 /* Dark Mode: Electric cyan primary accent glow */
-.keycap-sculpted:hover {
-  border-color: rgba(6, 182, 212, 0.75);
-  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.4),
-              0 0 12px 1px rgba(6, 182, 212, 0.32),
-              0 6px 16px -2px rgba(6, 182, 212, 0.2);
+/* Dark Mode: subtle hairline border and soft glow */
+.keycap-neomodern:hover {
+  border-color: rgba(6, 182, 212, 0.5);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 0 0 8px 0 rgba(6, 182, 212, 0.15);
 }
 
-/* Light Mode: Vibrant cyan/sky primary accent glow */
-.keycap-light-sculpted:hover {
+/* Light Mode: subtle hairline border and soft shadow */
+.keycap-neomodern-light:hover {
   border-color: #0284c7;
-  box-shadow: 0 4px 0 0 #94a3b8,
-              0 0 10px 1px rgba(14, 165, 233, 0.3),
-              0 6px 14px -2px rgba(14, 165, 233, 0.2);
-}
-
-/* Slight lift on hover for digit keys */
-.fluid-keypad-num:hover {
-  transform: translateY(-2px);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.08);
 }
 
 /* Authentic Continuous Paper Feed Perforations */

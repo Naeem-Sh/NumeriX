@@ -23,7 +23,7 @@ export function exportTapeToExcel(
   });
 
   const headerRows = [
-    ['ORGANIZATION:', settings.companyName || 'IOOC - Shiraz Office'],
+    ['ORGANIZATION:', settings.companyName || 'Corporate Finance'],
     ['DEPARTMENT:', settings.department || 'Finance & Accounting'],
     ['OPERATOR:', settings.operatorName || 'N.Shaaeri'],
     ['REPORT TITLE:', 'CALCULATION AUDIT & TAPE REPORT'],
@@ -77,7 +77,7 @@ export function exportTapeToExcel(
     ['Maximum Value', maxVal],
     ['Minimum Value', minVal],
     [],
-    ['FOOTER SIGNATURE:', 'IOOC-ShirazOffice | Developed by: N.Shaaeri/A.Kanani'],
+    ['FOOTER SIGNATURE:', 'Developed by: N.Shaaeri'],
   ];
 
   const fullSheetData = [...headerRows, ...dataRows, ...summaryRows];

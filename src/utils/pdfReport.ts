@@ -2,7 +2,12 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { CalculationRecord, CalculatorSettings, PrintOptions } from '../types';
 import { formatAccountingNumber } from './numberFormat';
-import { getNumerixHorizontalLogoPng, getNumerixEmblemLogoPng } from './numerixLogoAsset';
+import {
+  getNumerixHorizontalLogoPng,
+  getNumerixEmblemLogoPng,
+  getNumerixMonoBlackLogoPng,
+  getNumerixMonoBlackEmblemPng,
+} from './numerixLogoAsset';
 
 export function generatePdfReport(
   records: CalculationRecord[],
@@ -29,30 +34,42 @@ export function generatePdfReport(
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 14;
 
-  const isGrayscale = customOptions?.colorMode === 'grayscale';
-  const isInkSaver = customOptions?.colorMode === 'ink_saver';
+  const effectiveColorMode = customOptions?.colorMode ?? 'mono_black';
+  const isMonoBlack = effectiveColorMode === 'mono_black';
+  const isGrayscale = effectiveColorMode === 'grayscale';
+  const isInkSaver = effectiveColorMode === 'ink_saver';
 
   // Primary Theme Colors
-  const primaryColor = isGrayscale || isInkSaver ? [30, 41, 59] : [15, 23, 42]; // #0F172A
-  const accentColor = isGrayscale || isInkSaver ? [71, 85, 105] : [14, 116, 144]; // Cyan or Slate
-  const textColor = [30, 41, 59];
+  const primaryColor = isMonoBlack
+    ? [0, 0, 0]
+    : isGrayscale || isInkSaver
+    ? [30, 41, 59]
+    : [15, 23, 42]; // #0F172A
+  const accentColor = isMonoBlack
+    ? [0, 0, 0]
+    : isGrayscale || isInkSaver
+    ? [71, 85, 105]
+    : [14, 116, 144]; // Cyan or Slate
+  const textColor = isMonoBlack ? [0, 0, 0] : [30, 41, 59];
 
   let startY = margin;
 
-  // 1. Draw Header & High-Resolution NumeriX Logo
+  // 1. Draw Header & High-Resolution NumeriX Logo (Color or Solid Mono-Black for B&W Printers)
   const showAppLogo = customOptions?.showLogo !== false;
   let logoEmbedded = false;
 
   if (showAppLogo) {
     try {
-      const horizontalLogoPng = getNumerixHorizontalLogoPng();
+      const horizontalLogoPng =
+        isMonoBlack || isGrayscale ? getNumerixMonoBlackLogoPng() : getNumerixHorizontalLogoPng();
       if (horizontalLogoPng) {
         doc.addImage(horizontalLogoPng, 'PNG', margin, startY, 44, 13.5, undefined, 'FAST');
         logoEmbedded = true;
       }
     } catch {
       try {
-        const emblemLogoPng = getNumerixEmblemLogoPng();
+        const emblemLogoPng =
+          isMonoBlack || isGrayscale ? getNumerixMonoBlackEmblemPng() : getNumerixEmblemLogoPng();
         if (emblemLogoPng) {
           doc.addImage(emblemLogoPng, 'PNG', margin, startY, 15, 15, undefined, 'FAST');
           logoEmbedded = true;
@@ -70,7 +87,7 @@ export function generatePdfReport(
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(15);
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.text(settings.companyName || 'IOOC - Shiraz Office', headerLeftOffset, startY + 5);
+    doc.text(settings.companyName || 'Corporate Finance', headerLeftOffset, startY + 5);
 
     // Department & Operator
     doc.setFont('helvetica', 'normal');
@@ -111,13 +128,8 @@ export function generatePdfReport(
 
     if (customOptions.watermark === 'NUMERIX_IOOC') {
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(32);
-      doc.text('NUMERIX', pageWidth / 2, pageHeight / 2 - 8, {
-        align: 'center',
-        angle: isLandscape ? 30 : 45,
-      });
-      doc.setFontSize(22);
-      doc.text('IOOC - SHIRAZ OFFICE', pageWidth / 2, pageHeight / 2 + 8, {
+      doc.setFontSize(36);
+      doc.text('NUMERIX AUDIT', pageWidth / 2, pageHeight / 2, {
         align: 'center',
         angle: isLandscape ? 30 : 45,
       });
@@ -160,19 +172,21 @@ export function generatePdfReport(
 
     doc.setFontSize(7.5);
     doc.setTextColor(100, 116, 139);
-    const colStep = (pageWidth - margin * 2) / 4;
-    doc.text('TOTAL ENTRIES', margin + 6, startY + 4.5);
-    doc.text('CUMULATIVE SUM', margin + colStep + 6, startY + 4.5);
-    doc.text('AVERAGE VALUE', margin + colStep * 2 + 6, startY + 4.5);
-    doc.text('MAX VALUE', margin + colStep * 3 + 6, startY + 4.5);
+    const colStep = (pageWidth - margin * 2) / 5;
+    doc.text('TOTAL ENTRIES', margin + 4, startY + 4.5);
+    doc.text('CUMULATIVE SUM', margin + colStep + 4, startY + 4.5);
+    doc.text('AVERAGE VALUE', margin + colStep * 2 + 4, startY + 4.5);
+    doc.text('MIN VALUE', margin + colStep * 3 + 4, startY + 4.5);
+    doc.text('MAX VALUE', margin + colStep * 4 + 4, startY + 4.5);
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9.5);
     doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-    doc.text(records.length.toString(), margin + 6, startY + 11);
-    doc.text(formatAccountingNumber(sum, settings.decimalPlaces, settings.numberFormat), margin + colStep + 6, startY + 11);
-    doc.text(formatAccountingNumber(avg, settings.decimalPlaces, settings.numberFormat), margin + colStep * 2 + 6, startY + 11);
-    doc.text(formatAccountingNumber(max, settings.decimalPlaces, settings.numberFormat), margin + colStep * 3 + 6, startY + 11);
+    doc.text(records.length.toString(), margin + 4, startY + 11);
+    doc.text(formatAccountingNumber(sum, settings.decimalPlaces, settings.numberFormat), margin + colStep + 4, startY + 11);
+    doc.text(formatAccountingNumber(avg, settings.decimalPlaces, settings.numberFormat), margin + colStep * 2 + 4, startY + 11);
+    doc.text(formatAccountingNumber(min, settings.decimalPlaces, settings.numberFormat), margin + colStep * 3 + 4, startY + 11);
+    doc.text(formatAccountingNumber(max, settings.decimalPlaces, settings.numberFormat), margin + colStep * 4 + 4, startY + 11);
 
     startY += 19;
   } else {
@@ -183,12 +197,14 @@ export function generatePdfReport(
   const showTime = customOptions?.showTimestamps !== false;
   const showLines = customOptions?.showLineNumbers !== false;
   const showOps = customOptions?.showOperationTypes !== false;
+  const showNotes = customOptions?.showNotes !== false;
 
   const tableHead: string[] = [];
   if (showLines) tableHead.push('#');
   if (showTime) tableHead.push('Time');
   tableHead.push('Mathematical Expression');
   if (showOps) tableHead.push('Type');
+  if (showNotes) tableHead.push('Note');
   tableHead.push('Result');
 
   const tableData = records.map((r, i) => {
@@ -197,6 +213,7 @@ export function generatePdfReport(
     if (showTime) row.push(r.displayTime || '');
     row.push(r.expression || '');
     if (showOps) row.push(r.operationType ? r.operationType.toUpperCase().replace('_', ' ') : 'MATH');
+    if (showNotes) row.push(r.note || '—');
     row.push(r.formattedResult || formatAccountingNumber(r.result, r.decimalPlaces, settings.numberFormat));
     return row;
   });
@@ -233,8 +250,9 @@ export function generatePdfReport(
     },
     columnStyles: {
       ...(showLines ? { 0: { cellWidth: 10, halign: 'center' } } : {}),
-      ...(showTime ? { [showLines ? 1 : 0]: { cellWidth: 20, halign: 'center' } } : {}),
-      [tableHead.length - 1]: { cellWidth: 42, halign: 'right', fontStyle: 'bold' },
+      ...(showTime ? { [showLines ? 1 : 0]: { cellWidth: 26, halign: 'center', overflow: 'visible' } } : {}),
+      ...(showNotes ? { [tableHead.indexOf('Note')]: { cellWidth: 36, halign: 'left', fontStyle: 'italic' } } : {}),
+      [tableHead.length - 1]: { cellWidth: 38, halign: 'right', fontStyle: 'bold' },
     },
     didDrawPage: (data) => {
       const pageNum = doc.getNumberOfPages();
@@ -245,7 +263,7 @@ export function generatePdfReport(
       doc.setTextColor(100, 116, 139);
 
       // Left footer
-      doc.text('IOOC-ShirazOffice  |  Developed by: N.Shaaeri/A.Kanani', margin, pageHeight - 8);
+      doc.text('Developed by: N.Shaaeri', margin, pageHeight - 8);
 
       // Right footer page number
       if (customOptions?.showPageNumbers !== false) {

@@ -62,72 +62,72 @@ export const Keypad: React.FC<KeypadProps> = ({
 }) => {
   const isLight = settings.theme === 'light';
 
-  // Key style helpers with ultra-high contrast and tactile 3D sculpted keycaps
-  const btnBase = `relative flex items-center justify-center font-bold select-none active:scale-[0.97] rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/50 cursor-pointer fluid-keypad-btn transition-all ${
-    isLight ? 'keycap-light-sculpted' : 'keycap-sculpted'
+  // Key style helpers with neomodern flat soft-matte keycaps, hairline borders, and subtle elevation
+  const btnBase = `relative flex items-center justify-center font-bold select-none active:scale-[0.98] active:translate-y-[0.5px] rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/40 cursor-pointer fluid-keypad-btn transition-all ${
+    isLight ? 'keycap-neomodern-light' : 'keycap-neomodern'
   }`;
 
-  // Number keys (0, 1, 2, ..., 9): High contrast with primary accent glowing border
+  // Number keys (0, 1, 2, ..., 9): Flat soft-matte with 1px hairline border
   const numBtn = `${btnBase} fluid-keypad-num ${
     isLight
-      ? 'bg-white hover:bg-stone-50 hover:text-stone-950 border-2 border-stone-300 text-stone-950 font-mono font-black text-lg sm:text-xl lg:text-2xl 2xl:text-3xl shadow-2xs'
-      : 'bg-slate-800/95 hover:bg-slate-750 hover:text-cyan-100 border border-slate-700/90 text-white font-mono font-bold text-lg sm:text-xl lg:text-2xl 2xl:text-3xl'
+      ? 'bg-white hover:bg-stone-50 hover:text-stone-950 border border-stone-200/90 text-stone-900 font-mono font-bold text-lg sm:text-xl lg:text-2xl 2xl:text-3xl'
+      : 'bg-slate-800/85 hover:bg-slate-750 hover:text-cyan-100 border border-slate-700/80 text-white font-mono font-bold text-lg sm:text-xl lg:text-2xl 2xl:text-3xl'
   }`;
 
   // Decimal Point key
   const dotBtn = `${btnBase} ${
     isLight
-      ? 'bg-white hover:bg-stone-50 border-2 border-stone-300 text-stone-950 font-mono font-black text-xl sm:text-2xl shadow-2xs'
-      : 'bg-slate-800/95 hover:bg-slate-750 border border-slate-700/90 text-white font-mono font-bold text-xl sm:text-2xl'
+      ? 'bg-white hover:bg-stone-50 border border-stone-200/90 text-stone-900 font-mono font-bold text-xl sm:text-2xl'
+      : 'bg-slate-800/85 hover:bg-slate-750 border border-slate-700/80 text-white font-mono font-bold text-xl sm:text-2xl'
   }`;
 
-  // Operator keys: High contrast teal/cyan
+  // Operator keys: Subtle soft tint
   const opBtn = `${btnBase} fluid-keypad-op ${
     isLight
-      ? 'bg-cyan-100 hover:bg-cyan-50 border-2 border-cyan-300 text-cyan-950 font-mono font-black text-lg sm:text-xl lg:text-2xl shadow-2xs'
-      : 'bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-700/80 text-cyan-300 font-mono font-bold text-lg sm:text-xl lg:text-2xl'
+      ? 'bg-cyan-50/80 hover:bg-cyan-100/90 border border-cyan-200/80 text-cyan-950 font-mono font-bold text-lg sm:text-xl lg:text-2xl'
+      : 'bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/70 text-cyan-300 font-mono font-bold text-lg sm:text-xl lg:text-2xl'
   }`;
 
   // Dedicated Tall Accumulator Plus Key (+) spanning 2 vertical rows
   const plusAccumulatorBtn = `${btnBase} ${
     isLight
-      ? 'bg-cyan-600 hover:bg-cyan-700 border-2 border-cyan-700 text-white font-mono font-black text-2xl sm:text-3xl shadow-md ring-1 ring-cyan-500/40'
-      : 'bg-cyan-500 hover:bg-cyan-400 border border-cyan-300 text-slate-950 font-mono font-black text-2xl sm:text-3xl shadow-md ring-1 ring-cyan-400/50'
+      ? 'bg-cyan-600 hover:bg-cyan-700 border border-cyan-600 text-white font-mono font-bold text-2xl sm:text-3xl'
+      : 'bg-cyan-500 hover:bg-cyan-400 border border-cyan-400 text-slate-950 font-mono font-bold text-2xl sm:text-3xl'
   }`;
 
   // Function keys: Crisp contrast borders with subtle hover feedback
   const fnBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-stone-100 hover:bg-stone-50 border-2 border-stone-300 text-stone-800 font-bold shadow-2xs'
-      : 'bg-slate-900 hover:bg-slate-850 border border-slate-750 text-slate-200 font-bold'
+      ? 'bg-stone-50/90 hover:bg-stone-100 border border-stone-200/90 text-stone-700 font-bold'
+      : 'bg-slate-850/80 hover:bg-slate-800 border border-slate-750/80 text-slate-300 font-bold'
   }`;
 
-  // Tax keys
+  // Tax keys: Subtle amber tint
   const taxBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-amber-100/80 hover:bg-amber-50 border-2 border-amber-300 text-amber-950 font-bold shadow-2xs'
-      : 'bg-amber-950/50 hover:bg-amber-900/60 border border-amber-700/80 text-amber-300 font-bold'
+      ? 'bg-amber-50/80 hover:bg-amber-100/90 border border-amber-200/80 text-amber-950 font-bold'
+      : 'bg-amber-950/30 hover:bg-amber-900/50 border border-amber-800/70 text-amber-300 font-bold'
   }`;
 
-  // Memory keys
+  // Memory keys: Subtle indigo tint
   const memBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-indigo-100/80 hover:bg-indigo-50 border-2 border-indigo-300 text-indigo-950 font-bold shadow-2xs'
-      : 'bg-indigo-950/50 hover:bg-indigo-900/60 border border-indigo-700/80 text-indigo-300 font-bold'
+      ? 'bg-indigo-50/80 hover:bg-indigo-100/90 border border-indigo-200/80 text-indigo-950 font-bold'
+      : 'bg-indigo-950/30 hover:bg-indigo-900/50 border border-indigo-800/70 text-indigo-300 font-bold'
   }`;
 
-  // Clear keys with tactile bevel inset
+  // Clear keys: Soft rose tint
   const clearBtn = `${btnBase} fluid-keypad-fn uppercase tracking-wider ${
     isLight
-      ? 'bg-rose-100 hover:bg-rose-50 border-2 border-rose-300 text-rose-950 font-black key-bevel-clear-light shadow-2xs'
-      : 'bg-rose-950/60 hover:bg-rose-900/70 border border-rose-700/80 text-rose-200 font-bold key-bevel-clear-dark'
+      ? 'bg-rose-50/90 hover:bg-rose-100 border border-rose-200/90 text-rose-950 font-bold'
+      : 'bg-rose-950/40 hover:bg-rose-900/60 border border-rose-900/70 text-rose-200 font-bold'
   }`;
 
-  // Enter / Calculate primary button with tactile bevel inset
+  // Enter / Calculate primary button
   const enterBtn = `${btnBase} fluid-keypad-enter ${
     isLight
-      ? 'bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold border-2 border-emerald-700 key-bevel-enter-light shadow-md'
-      : 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold border border-emerald-500 key-bevel-enter-dark shadow-md'
+      ? 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold border border-emerald-600'
+      : 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold border border-emerald-500'
   }`;
 
   return (

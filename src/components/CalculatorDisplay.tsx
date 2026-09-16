@@ -95,7 +95,7 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
   const getShaderClass = () => {
     if (isLight) {
       if (displayStyle === 'classic_lcd') return 'shader-classic-lcd';
-      return 'bg-[#fcfdfd] border-slate-300 text-slate-950 shadow-inner';
+      return 'bg-[#f8fafc] border-slate-200/90 text-slate-950 shadow-[inset_0_2px_4px_rgba(0,0,0,0.03)]';
     }
     switch (displayStyle) {
       case 'amber_glow':
@@ -113,11 +113,11 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
   return (
     <div
       id="calculator-main-display"
-      className={`relative flex flex-col p-3 sm:p-3.5 lg:p-4 rounded-xl xl:rounded-2xl border-2 transition-all duration-300 shadow-inner ${
+      className={`relative flex flex-col justify-between p-3.5 sm:p-4 lg:p-5 rounded-2xl border transition-all duration-300 ${
         copiedType
           ? isLight
-            ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-400/40 text-slate-950 shadow-md'
-            : 'bg-slate-950 border-emerald-500/70 ring-2 ring-emerald-500/30 text-white shadow-inner'
+            ? 'bg-emerald-50 border-emerald-400 text-slate-950 shadow-[inset_0_1px_4px_rgba(16,185,129,0.1)]'
+            : 'bg-slate-950 border-emerald-500/70 text-white shadow-[inset_0_2px_8px_rgba(16,185,129,0.25)]'
           : getShaderClass()
       }`}
     >
@@ -153,17 +153,17 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Top Status & Indicator Bar */}
-      <div className="flex items-center justify-between text-xs mb-1 opacity-90 select-none">
-        {/* Left: Memory & GT badges */}
+      {/* Top Status & Understated Corner Toolbar */}
+      <div className="flex items-center justify-between text-xs mb-1.5 opacity-90 select-none">
+        {/* Left: Minimalist Status Badges */}
         <div className="flex items-center gap-1.5 sm:gap-2">
           {hasMemory && (
             <span
               id="display-memory-badge"
-              className={`px-1.5 py-0.5 rounded font-mono text-[10px] sm:text-[11px] font-black border ${
+              className={`px-1.5 py-0.5 rounded font-mono text-[10px] font-bold border ${
                 isLight
-                  ? 'bg-amber-100 border-amber-400 text-amber-950 shadow-2xs'
-                  : 'bg-amber-950/60 border-amber-700/80 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
+                  ? 'bg-amber-50 border-amber-300 text-amber-900'
+                  : 'bg-amber-950/50 border-amber-700/70 text-amber-300'
               }`}
               title={`Memory Register: ${memoryValue}`}
             >
@@ -174,10 +174,10 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
           {hasGrandTotal && (
             <span
               id="display-gt-badge"
-              className={`px-1.5 py-0.5 rounded font-mono text-[10px] sm:text-[11px] font-black border ${
+              className={`px-1.5 py-0.5 rounded font-mono text-[10px] font-bold border ${
                 isLight
-                  ? 'bg-indigo-100 border-indigo-400 text-indigo-950'
-                  : 'bg-indigo-950/60 border-indigo-700/80 text-indigo-300'
+                  ? 'bg-indigo-50 border-indigo-300 text-indigo-900'
+                  : 'bg-indigo-950/50 border-indigo-700/70 text-indigo-300'
               }`}
               title={`Grand Total Register: ${grandTotal}`}
             >
@@ -186,8 +186,8 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
           )}
 
           <span
-            className={`px-1.5 py-0.5 rounded font-mono text-[10px] font-bold ${
-              isLight ? 'bg-slate-200 text-slate-900 border border-slate-300' : 'bg-slate-800 text-slate-300'
+            className={`px-1.5 py-0.5 rounded font-mono text-[10px] font-medium border ${
+              isLight ? 'bg-slate-100/90 text-slate-600 border-slate-200' : 'bg-slate-850/60 text-slate-400 border-slate-750'
             }`}
           >
             TAX: {settings.taxRate}%
@@ -199,231 +199,204 @@ export const CalculatorDisplay: React.FC<CalculatorDisplayProps> = ({
             id="calculator-display-numlock-badge"
             onClick={onToggleNumLock}
             title={`Physical Keyboard Num Lock: ${
-              isNumLockOn ? 'ON (Numpad input active)' : 'OFF (Numpad input disabled / navigation mode)'
+              isNumLockOn ? 'ON' : 'OFF'
             }. Press Num Lock on your keyboard or click here to toggle.`}
-            className={`flex items-center gap-1.5 px-2 py-0.5 rounded font-mono text-[10px] sm:text-[11px] font-black border transition-all cursor-pointer select-none ${
+            className={`flex items-center gap-1 px-1.5 py-0.5 rounded font-mono text-[10px] font-bold border transition-colors cursor-pointer select-none ${
               isNumLockOn
                 ? isLight
-                  ? 'bg-emerald-100 border-emerald-400 text-emerald-950 shadow-xs hover:bg-emerald-200'
-                  : 'bg-emerald-950/70 border-emerald-500/80 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.2)] hover:bg-emerald-900/80'
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100'
+                  : 'bg-emerald-950/50 border-emerald-700/70 text-emerald-300 hover:bg-emerald-900/60'
                 : isLight
-                  ? 'bg-amber-100 border-amber-400 text-amber-950 shadow-xs animate-pulse hover:bg-amber-200'
-                  : 'bg-amber-950/70 border-amber-500/80 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse hover:bg-amber-900/80'
+                  ? 'bg-amber-50 border-amber-300 text-amber-900 animate-pulse hover:bg-amber-100'
+                  : 'bg-amber-950/50 border-amber-700/70 text-amber-300 animate-pulse hover:bg-amber-900/60'
             }`}
           >
-            {/* Glowing Hardware-Style LED Lamp */}
             <span
-              className={`w-2 h-2 rounded-full transition-all shrink-0 ${
-                isNumLockOn
-                  ? 'bg-emerald-500 shadow-[0_0_7px_#10b981] ring-1 ring-emerald-400'
-                  : 'bg-amber-500 shadow-[0_0_7px_#f59e0b] ring-1 ring-amber-400'
+              className={`w-1.5 h-1.5 rounded-full transition-all shrink-0 ${
+                isNumLockOn ? 'bg-emerald-500 ring-1 ring-emerald-400' : 'bg-amber-500 ring-1 ring-amber-400'
               }`}
             />
-            <span className="tracking-tight uppercase">
-              NUM {isNumLockOn ? 'ON' : 'OFF'}
-            </span>
+            <span>NUM {isNumLockOn ? 'ON' : 'OFF'}</span>
           </button>
         </div>
 
-        {/* Right: Decimal Controls (DEC - / DEC +) */}
-        <div className={`flex items-center gap-1 p-0.5 sm:p-1 rounded-lg border ${
-          isLight ? 'bg-slate-100 border-slate-300' : 'bg-slate-800/40 border-slate-700/40'
+        {/* Right: Understated Corner Status Bar (Undo/Redo, Decimal Adjustment, Quick Copy) */}
+        <div className={`flex items-center gap-0.5 sm:gap-1 p-0.5 rounded-lg border ${
+          isLight ? 'bg-white/85 border-slate-200/90 shadow-2xs' : 'bg-slate-900/70 border-slate-800'
         }`}>
-          <button
-            id="dec-decrease-btn"
-            onClick={onDecDecrease}
-            disabled={settings.decimalPlaces <= 0}
-            title="Decrease decimal precision (DEC −)"
-            className={`px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-bold border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-              isLight
-                ? 'bg-white hover:bg-slate-200 text-slate-950 border-slate-300'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
-            }`}
-          >
-            <span className="flex items-center gap-0.5">
-              <Minus className="w-2.5 h-2.5 stroke-[3]" /> DEC
-            </span>
-          </button>
-
-          {/* Direct Decimal Precision Selector / Indicator */}
-          <div className="flex items-center px-0.5 font-mono text-xs font-black">
-            <span className={`px-1.5 py-0.5 rounded text-[11px] font-bold ${
-              isLight ? 'bg-cyan-100 text-cyan-950 border border-cyan-300' : 'bg-cyan-500/20 text-cyan-300'
-            }`}>
-              .{settings.decimalPlaces}
-            </span>
-          </div>
-
-          <button
-            id="dec-increase-btn"
-            onClick={onDecIncrease}
-            disabled={settings.decimalPlaces >= 8}
-            title="Increase decimal precision (DEC +)"
-            className={`px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-bold border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-              isLight
-                ? 'bg-white hover:bg-slate-200 text-slate-950 border-slate-300'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
-            }`}
-          >
-            <span className="flex items-center gap-0.5">
-              <Plus className="w-2.5 h-2.5 stroke-[3]" /> DEC
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {/* Expression Tape Trail */}
-      <div className="h-5 sm:h-6 overflow-x-auto overflow-y-hidden text-right font-mono text-xs sm:text-sm tracking-wider whitespace-nowrap scrollbar-none flex items-center justify-end">
-        {expression ? (
-          <span className={isLight ? 'text-slate-800 font-bold' : 'text-slate-300 font-medium'}>{expression}</span>
-        ) : (
-          <span className={isLight ? 'text-slate-500 text-[11px] italic' : 'text-slate-500 text-[11px] italic'}>
-            Enter expression or click keys
-          </span>
-        )}
-      </div>
-
-      {/* Primary Display / Giant Formatted Number with Click-to-Copy */}
-      <div className="relative flex items-center justify-between min-h-[48px] sm:min-h-[56px] lg:min-h-[64px] py-1 group/res gap-2">
-        {/* Left Annunciators: Classic Desktop Calculator 'M' Memory & 'GT' Flags */}
-        <div className="flex items-center gap-1.5 self-center shrink-0 select-none">
-          {hasMemory && (
-            <span
-              id="display-memory-flag-m"
-              title={`Memory In Use: ${formatAccountingNumber(memoryValue, settings.decimalPlaces, settings.numberFormat)}`}
-              className={`px-1.5 py-0.5 rounded text-[11px] sm:text-xs font-black font-mono tracking-wider border transition-all ${
-                isLight
-                  ? 'bg-amber-100 text-amber-950 border-amber-400 shadow-2xs font-extrabold ring-1 ring-amber-400/50'
-                  : 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_8px_rgba(245,158,11,0.35)] ring-1 ring-amber-500/40 font-black'
-              }`}
-            >
-              M
-            </span>
-          )}
-          {hasGrandTotal && (
-            <span
-              id="display-gt-flag"
-              title={`Grand Total In Use: ${formatAccountingNumber(grandTotal, settings.decimalPlaces, settings.numberFormat)}`}
-              className={`px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-black font-mono tracking-wider border transition-all ${
-                isLight
-                  ? 'bg-indigo-100 text-indigo-950 border-indigo-300'
-                  : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50'
-              }`}
-            >
-              GT
-            </span>
-          )}
-        </div>
-
-        <div
-          id="calculator-result-text"
-          onClick={() => handleCopy(false)}
-          title="Click to copy formatted result to clipboard"
-          className={`flex-1 font-mono font-black tracking-tight text-right select-all overflow-x-auto scrollbar-none cursor-pointer rounded-lg px-1 transition-all ${
-            errorMessage
-              ? 'text-rose-600 text-xl sm:text-2xl font-sans cursor-default font-bold'
-              : primaryDisplayValue.length > 16
-              ? 'text-2xl sm:text-3xl lg:text-4xl'
-              : primaryDisplayValue.length > 11
-              ? 'text-3xl sm:text-4xl lg:text-5xl'
-              : 'text-4xl sm:text-5xl lg:text-6xl 2xl:text-7xl'
-          } ${
-            isLight && !errorMessage
-              ? 'text-slate-950 hover:bg-slate-100'
-              : errorMessage
-              ? 'text-rose-600'
-              : 'text-slate-50 hover:bg-slate-900/60'
-          }`}
-        >
-          {primaryDisplayValue}
-        </div>
-      </div>
-
-      {/* Bottom Quick-Action Bar for Copying & Undo/Redo */}
-      <div className={`flex flex-wrap items-center justify-between pt-1.5 border-t text-xs gap-1.5 ${
-        isLight ? 'border-slate-300 text-slate-800' : 'border-slate-800/40 text-slate-400'
-      }`}>
-        <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono font-semibold">
-          <span>Format: {settings.numberFormat.replace('_', ' / ')}</span>
-          <span>•</span>
-          <span>Precision: {settings.decimalPlaces} dec</span>
-        </div>
-
-        <div className="flex items-center gap-1 sm:gap-1.5">
-          {/* Undo / Redo controls */}
+          {/* Undo */}
           {onUndo && (
             <button
               id="calculator-undo-btn"
               onClick={onUndo}
               disabled={!canUndo}
               title="Undo calculation step (Ctrl+Z)"
-              className={`p-1 sm:p-1.5 rounded-md border text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-                isLight
-                  ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-900'
-                  : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+              className={`p-1 rounded transition-colors cursor-pointer disabled:opacity-25 disabled:cursor-not-allowed ${
+                isLight ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-slate-800 text-slate-300'
               }`}
             >
               <Undo2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Undo</span>
             </button>
           )}
 
+          {/* Redo */}
           {onRedo && (
             <button
               id="calculator-redo-btn"
               onClick={onRedo}
               disabled={!canRedo}
               title="Redo calculation step (Ctrl+Y)"
-              className={`p-1 sm:p-1.5 rounded-md border text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-                isLight
-                  ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-900'
-                  : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+              className={`p-1 rounded transition-colors cursor-pointer disabled:opacity-25 disabled:cursor-not-allowed ${
+                isLight ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-slate-800 text-slate-300'
               }`}
             >
               <Redo2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Redo</span>
             </button>
           )}
+
+          <div className={`h-3 w-px mx-0.5 ${isLight ? 'bg-slate-200' : 'bg-slate-800'}`} />
+
+          {/* Decimal Stepper (- .prec +) */}
+          <div className="flex items-center gap-0.5">
+            <button
+              id="dec-decrease-btn"
+              onClick={onDecDecrease}
+              disabled={settings.decimalPlaces <= 0}
+              title="Decrease decimal precision (DEC −)"
+              className={`p-0.5 rounded transition-colors cursor-pointer disabled:opacity-25 disabled:cursor-not-allowed ${
+                isLight ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-slate-800 text-slate-300'
+              }`}
+            >
+              <Minus className="w-2.5 h-2.5 stroke-[2.5]" />
+            </button>
+            <span
+              title={`Decimal Precision: ${settings.decimalPlaces}`}
+              className={`px-0.5 font-mono text-[11px] font-bold ${
+                isLight ? 'text-cyan-800' : 'text-cyan-400'
+              }`}
+            >
+              .{settings.decimalPlaces}
+            </span>
+            <button
+              id="dec-increase-btn"
+              onClick={onDecIncrease}
+              disabled={settings.decimalPlaces >= 8}
+              title="Increase decimal precision (DEC +)"
+              className={`p-0.5 rounded transition-colors cursor-pointer disabled:opacity-25 disabled:cursor-not-allowed ${
+                isLight ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-slate-800 text-slate-300'
+              }`}
+            >
+              <Plus className="w-2.5 h-2.5 stroke-[2.5]" />
+            </button>
+          </div>
+
+          <div className={`h-3 w-px mx-0.5 ${isLight ? 'bg-slate-200' : 'bg-slate-800'}`} />
 
           {/* Copy Formatted Button */}
           <button
             id="display-copy-formatted-btn"
             onClick={() => handleCopy(false)}
             disabled={!!errorMessage}
-            title="Copy formatted number with thousand separators"
-            className={`flex items-center gap-1 px-2 py-1 rounded-md border text-[11px] font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-              copiedType === 'formatted'
-                ? 'bg-emerald-600 text-white border-emerald-600'
-                : isLight
-                ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-900'
-                : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+            title="Copy formatted number with separators"
+            className={`p-1 rounded transition-colors cursor-pointer disabled:opacity-25 disabled:cursor-not-allowed ${
+              isLight ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-slate-800 text-slate-300'
             }`}
           >
             {copiedType === 'formatted' ? (
-              <Check className="w-3 h-3 text-white stroke-[3]" />
+              <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
             ) : (
-              <Copy className="w-3 h-3 text-cyan-600" />
+              <Copy className="w-3.5 h-3.5" />
             )}
-            <span>Copy</span>
           </button>
 
-          {/* Copy Plain / Excel Value Button */}
+          {/* Copy Plain for Excel Button */}
           <button
             id="display-copy-raw-btn"
             onClick={() => handleCopy(true)}
             disabled={!!errorMessage}
-            title="Copy plain decimal value without commas (ready for spreadsheet cells)"
-            className={`flex items-center gap-1 px-2 py-1 rounded-md border text-[11px] font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-              copiedType === 'raw'
-                ? 'bg-emerald-600 text-white border-emerald-600'
-                : isLight
-                ? 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-950'
-                : 'bg-emerald-950/40 hover:bg-emerald-900/60 border-emerald-800 text-emerald-300'
+            title="Copy plain decimal value for spreadsheets"
+            className={`p-1 rounded transition-colors cursor-pointer disabled:opacity-25 disabled:cursor-not-allowed ${
+              isLight ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-slate-800 text-slate-300'
             }`}
           >
-            <FileSpreadsheet className="w-3 h-3" />
-            <span>Excel Value</span>
+            {copiedType === 'raw' ? (
+              <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />
+            ) : (
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+            )}
           </button>
+        </div>
+      </div>
+
+      {/* Main Focus Area: 90% of screen surface purely dedicated to expression & bold primary total */}
+      <div className="flex flex-col justify-center flex-1 my-auto py-1 sm:py-1.5">
+        {/* Expression Tape Trail */}
+        <div className="h-6 overflow-x-auto overflow-y-hidden text-right font-mono text-xs sm:text-sm tracking-wider whitespace-nowrap scrollbar-none flex items-center justify-end">
+          {expression ? (
+            <span className={isLight ? 'text-slate-700 font-semibold' : 'text-slate-300 font-medium'}>
+              {expression}
+            </span>
+          ) : (
+            <span className="text-slate-400 dark:text-slate-600 text-[11px] italic">
+              Ready
+            </span>
+          )}
+        </div>
+
+        {/* Primary Display / Giant Formatted Number with Click-to-Copy */}
+        <div className="relative flex items-center justify-between min-h-[50px] sm:min-h-[58px] lg:min-h-[66px] py-1 group/res gap-2">
+          {/* Left Annunciators: Classic Desktop Calculator 'M' Memory & 'GT' Flags */}
+          <div className="flex items-center gap-1.5 self-center shrink-0 select-none">
+            {hasMemory && (
+              <span
+                id="display-memory-flag-m"
+                title={`Memory In Use: ${formatAccountingNumber(memoryValue, settings.decimalPlaces, settings.numberFormat)}`}
+                className={`px-1.5 py-0.5 rounded text-[11px] sm:text-xs font-black font-mono tracking-wider border transition-all ${
+                  isLight
+                    ? 'bg-amber-100 text-amber-950 border-amber-300'
+                    : 'bg-amber-500/20 text-amber-300 border-amber-500/50'
+                }`}
+              >
+                M
+              </span>
+            )}
+            {hasGrandTotal && (
+              <span
+                id="display-gt-flag"
+                title={`Grand Total In Use: ${formatAccountingNumber(grandTotal, settings.decimalPlaces, settings.numberFormat)}`}
+                className={`px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-black font-mono tracking-wider border transition-all ${
+                  isLight
+                    ? 'bg-indigo-100 text-indigo-950 border-indigo-300'
+                    : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50'
+                }`}
+              >
+                GT
+              </span>
+            )}
+          </div>
+
+          <div
+            id="calculator-result-text"
+            onClick={() => handleCopy(false)}
+            title="Click to copy formatted result to clipboard"
+            className={`flex-1 font-mono font-black tracking-tight text-right select-all overflow-x-auto scrollbar-none cursor-pointer rounded-lg px-1 transition-all ${
+              errorMessage
+                ? 'text-rose-600 text-xl sm:text-2xl font-sans cursor-default font-bold'
+                : primaryDisplayValue.length > 16
+                ? 'text-2xl sm:text-3xl lg:text-4xl'
+                : primaryDisplayValue.length > 11
+                ? 'text-3xl sm:text-4xl lg:text-5xl'
+                : 'text-4xl sm:text-5xl lg:text-6xl 2xl:text-7xl'
+            } ${
+              isLight && !errorMessage
+                ? 'text-slate-950 hover:bg-slate-100'
+                : errorMessage
+                ? 'text-rose-600'
+                : 'text-slate-50 hover:bg-slate-900/60'
+            }`}
+          >
+            {primaryDisplayValue}
+          </div>
         </div>
       </div>
     </div>

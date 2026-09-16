@@ -181,6 +181,146 @@ export const NUMERIX_EMBLEM_DATA_URL = `data:image/svg+xml;utf8,${encodeURICompo
 // Cached PNG Data URLs for instant synchronous PDF generation
 let cachedHorizontalPng: string | null = null;
 let cachedEmblemPng: string | null = null;
+let cachedMonoHorizontalPng: string | null = null;
+let cachedMonoEmblemPng: string | null = null;
+
+/**
+ * Creates and caches a high-definition Monochrome Pure-Black raster PNG Data URL.
+ * Specially engineered for monochrome (black and white) laser printers, dot-matrix, and thermal printers.
+ * Eliminates gradient dithering, halftones, and fuzzy drop-shadows by using 100% solid black vector linework.
+ */
+export function getNumerixMonoBlackLogoPng(): string {
+  if (cachedMonoHorizontalPng) return cachedMonoHorizontalPng;
+  if (typeof document === 'undefined') return '';
+
+  try {
+    const canvas = document.createElement('canvas');
+    const scale = 3;
+    const width = 360;
+    const height = 110;
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '';
+    ctx.scale(scale, scale);
+
+    // --- 1. Left Emblem (Solid Black #000000 with crisp geometric punch) ---
+    ctx.save();
+    ctx.translate(5, 5);
+    ctx.scale(0.52, 0.52);
+
+    ctx.fillStyle = '#000000';
+
+    // Left Arm
+    const navyPath = new Path2D(
+      'M 62 28 C 45 32, 32 48, 30 68 C 28 88, 44 108, 62 125 L 75 137 C 88 150, 94 164, 85 172 C 76 180, 58 174, 45 158 C 35 145, 30 125, 34 106 C 31 128, 38 152, 54 166 C 70 179, 92 175, 102 158 C 112 140, 98 118, 82 100 L 68 85 C 54 70, 50 54, 58 42 C 67 30, 84 34, 98 48 L 105 55 C 92 38, 78 24, 62 28 Z'
+    );
+    ctx.fill(navyPath);
+
+    // Dynamic Ascending Arrow Arm
+    const orangePath = new Path2D(
+      'M 65 168 C 80 176, 100 168, 115 150 C 130 132, 140 108, 152 85 L 170 48 L 184 58 L 186 14 L 142 20 L 155 33 L 138 66 C 128 86, 118 106, 106 122 C 94 138, 80 152, 65 168 Z'
+    );
+    ctx.fill(orangePath);
+
+    // Arrowhead
+    const arrowPath = new Path2D('M 186 14 L 142 20 L 155 33 L 172 30 L 148 75 L 162 68 L 186 14 Z');
+    ctx.fill(arrowPath);
+
+    // Math symbols in solid black
+    ctx.fillRect(25, 75, 18, 6);
+    ctx.fillRect(31, 69, 6, 18);
+
+    ctx.beginPath();
+    ctx.arc(168, 64, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(157, 75, 22, 6);
+    ctx.beginPath();
+    ctx.arc(168, 92, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Multiply Symbol
+    ctx.save();
+    ctx.translate(170, 42);
+    ctx.rotate((45 * Math.PI) / 180);
+    ctx.fillRect(-8, -2, 16, 4);
+    ctx.fillRect(-2, -8, 4, 16);
+    ctx.restore();
+
+    // Center Diamond Vortex
+    ctx.beginPath();
+    ctx.moveTo(100, 68);
+    ctx.lineTo(110, 90);
+    ctx.lineTo(100, 112);
+    ctx.lineTo(90, 90);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+
+    // --- 2. Typography (Solid 100% Black #000000 - No Gradients) ---
+    ctx.font = '900 42px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#000000';
+    ctx.fillText('NUMERI', 115, 46);
+
+    const xOffset = 115 + ctx.measureText('NUMERI').width + 2;
+    ctx.fillText('X', xOffset, 46);
+
+    ctx.font = '800 13px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.letterSpacing = '3px';
+    ctx.fillStyle = '#1e293b';
+    ctx.fillText('WEB CALCULATOR', 118, 78);
+
+    cachedMonoHorizontalPng = canvas.toDataURL('image/png');
+    return cachedMonoHorizontalPng;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Creates and caches a high-definition Monochrome Pure-Black square emblem PNG Data URL.
+ */
+export function getNumerixMonoBlackEmblemPng(): string {
+  if (cachedMonoEmblemPng) return cachedMonoEmblemPng;
+  if (typeof document === 'undefined') return '';
+
+  try {
+    const canvas = document.createElement('canvas');
+    const scale = 3;
+    const size = 180;
+    canvas.width = size * scale;
+    canvas.height = size * scale;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '';
+    ctx.scale(scale, scale);
+
+    ctx.save();
+    ctx.translate(5, 5);
+    ctx.scale(0.85, 0.85);
+
+    ctx.fillStyle = '#000000';
+    ctx.fill(
+      new Path2D(
+        'M 62 28 C 45 32, 32 48, 30 68 C 28 88, 44 108, 62 125 L 75 137 C 88 150, 94 164, 85 172 C 76 180, 58 174, 45 158 C 35 145, 30 125, 34 106 C 31 128, 38 152, 54 166 C 70 179, 92 175, 102 158 C 112 140, 98 118, 82 100 L 68 85 C 54 70, 50 54, 58 42 C 67 30, 84 34, 98 48 L 105 55 C 92 38, 78 24, 62 28 Z'
+      )
+    );
+    ctx.fill(
+      new Path2D(
+        'M 65 168 C 80 176, 100 168, 115 150 C 130 132, 140 108, 152 85 L 170 48 L 184 58 L 186 14 L 142 20 L 155 33 L 138 66 C 128 86, 118 106, 106 122 C 94 138, 80 152, 65 168 Z'
+      )
+    );
+    ctx.restore();
+
+    cachedMonoEmblemPng = canvas.toDataURL('image/png');
+    return cachedMonoEmblemPng;
+  } catch {
+    return '';
+  }
+}
 
 /**
  * Creates and caches a high-definition raster PNG Data URL for the horizontal NumeriX logo.

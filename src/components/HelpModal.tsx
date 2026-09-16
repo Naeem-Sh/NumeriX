@@ -158,7 +158,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose, settings 
           }`}
         >
           <span className={`text-xs ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>
-            IOOC-ShirazOffice • Developed by: N.Shaaeri/A.Kanani
+            Developed by: N.Shaaeri
           </span>
           <button
             onClick={onClose}

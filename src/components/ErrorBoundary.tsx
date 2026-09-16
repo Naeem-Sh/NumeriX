@@ -98,7 +98,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             </div>
 
             <div className="text-[11px] text-stone-500 pt-1">
-              NumeriX Financial Calculator • IOOC-ShirazOffice
+              NumeriX Financial Calculator
             </div>
           </div>
         </div>

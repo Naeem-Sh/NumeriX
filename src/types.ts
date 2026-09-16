@@ -51,7 +51,7 @@ export interface TapeSummary {
 
 export type PrintPaperSize = 'A4' | 'Letter' | 'Legal' | 'Receipt';
 export type PrintOrientation = 'portrait' | 'landscape';
-export type PrintColorMode = 'color' | 'grayscale' | 'ink_saver';
+export type PrintColorMode = 'color' | 'mono_black' | 'grayscale' | 'ink_saver';
 export type PrintDensity = 'compact' | 'standard' | 'spacious';
 export type PrintWatermark = 'NONE' | 'NUMERIX_IOOC' | 'CONFIDENTIAL' | 'DRAFT' | 'AUDITED' | 'APPROVED' | 'COPY';
 

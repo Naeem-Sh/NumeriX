@@ -37,11 +37,11 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
 }) => {
   const isLight = settings.theme === 'light';
 
-  // Print & Layout Options State
+  // Print & Layout Options State (Defaults to Mono Black for crisp monochrome printer support)
   const [options, setOptions] = useState<PrintOptions>({
     paperSize: 'A4',
     orientation: 'portrait',
-    colorMode: 'color',
+    colorMode: 'mono_black',
     density: 'standard',
     scale: 100,
     title: 'CALCULATION AUDIT REPORT',
@@ -124,14 +124,44 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
             size: ${isReceipt ? '80mm auto' : `${options.paperSize} ${options.orientation}`};
             margin: ${isReceipt ? '3mm 4mm' : '8mm 12mm 8mm 12mm'};
           }
-          html, body, #root, #app-root-container, #print-preview-modal-backdrop, #print-preview-modal, #print-modal-body, #print-preview-canvas-container, #print-sheet-stage, #print-sheet-paper, #printable-report-area {
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          html, body, #root, #app-root-container, #print-preview-modal-backdrop, #print-preview-modal, #print-modal-body, #print-preview-canvas-container, #print-sheet-stage, #print-sheet-paper {
             background: #ffffff !important;
             background-color: #ffffff !important;
             min-height: 0 !important;
             height: auto !important;
           }
-          #printable-report-area, #printable-report-area * {
+          #printable-report-area {
+            background: #ffffff !important;
             background-color: #ffffff !important;
+          }
+          ${
+            options.colorMode === 'mono_black'
+              ? `
+            #printable-report-area {
+              color: #000000 !important;
+            }
+            #printable-report-area table,
+            #printable-report-area th,
+            #printable-report-area td,
+            #printable-report-area h1,
+            #printable-report-area h2,
+            #printable-report-area p,
+            #printable-report-area span {
+              color: #000000 !important;
+              border-color: #000000 !important;
+            }
+            #printable-report-area .border-slate-800,
+            #printable-report-area .border-slate-300,
+            #printable-report-area .border-slate-200 {
+              border-color: #000000 !important;
+            }
+          `
+              : ''
           }
         }
       `}</style>
@@ -327,19 +357,27 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
 
                 {/* Color Mode */}
                 <div>
-                  <label className={`block font-semibold mb-1.5 ${isLight ? 'text-stone-700' : 'text-slate-300'}`}>
-                    Color & Contrast Mode
-                  </label>
-                  <div className="grid grid-cols-3 gap-1.5">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className={`font-semibold ${isLight ? 'text-stone-700' : 'text-slate-300'}`}>
+                      Color & Contrast Mode
+                    </label>
+                    {options.colorMode === 'mono_black' && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded font-bold uppercase bg-stone-900 text-white">
+                        B&W Laser Ready
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
                     {[
-                      { id: 'color', label: 'Color', desc: 'Navy/Cyan' },
-                      { id: 'grayscale', label: 'Grayscale', desc: 'Monochrome' },
-                      { id: 'ink_saver', label: 'Eco Saver', desc: 'Minimal Ink' },
+                      { id: 'color', label: '🌈 Full Color', desc: 'Navy, Cyan & Orange' },
+                      { id: 'mono_black', label: '🖤 Mono Black', desc: '100% Solid Black (B&W Printers)' },
+                      { id: 'grayscale', label: '🔘 Grayscale', desc: 'Balanced 256-Gray' },
+                      { id: 'ink_saver', label: '🌱 Eco Saver', desc: 'Ultra-light ink' },
                     ].map((mode) => (
                       <button
                         key={mode.id}
                         onClick={() => setOptions({ ...options, colorMode: mode.id as PrintColorMode })}
-                        className={`py-1.5 px-2 rounded-lg border text-xs font-medium transition-colors cursor-pointer text-center ${
+                        className={`py-2 px-2.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer text-left ${
                           options.colorMode === mode.id
                             ? isLight
                               ? 'bg-cyan-50 border-cyan-500 text-cyan-950 ring-1 ring-cyan-500/50 font-bold'
@@ -349,7 +387,7 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                             : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'
                         }`}
                       >
-                        <div>{mode.label}</div>
+                        <div className="font-bold">{mode.label}</div>
                         <div className={`text-[10px] ${options.colorMode === mode.id ? (isLight ? 'text-cyan-800' : 'text-cyan-300/70') : (isLight ? 'text-stone-500' : 'opacity-60')}`}>{mode.desc}</div>
                       </button>
                     ))}
@@ -402,7 +440,7 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                     }`}
                   >
                     <option value="NONE">None (Clean Background)</option>
-                    <option value="NUMERIX_IOOC">NumeriX logo + IOOC-ShirazOffice</option>
+                    <option value="NUMERIX_IOOC">NumeriX Logo Watermark</option>
                     <option value="CONFIDENTIAL">CONFIDENTIAL</option>
                     <option value="DRAFT">DRAFT</option>
                     <option value="AUDITED">AUDITED</option>
@@ -508,7 +546,9 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                     ? 'w-[900px] min-h-[620px] p-8 text-xs'
                     : 'w-[720px] min-h-[920px] p-8 text-xs'
                 } ${
-                  options.colorMode === 'grayscale'
+                  options.colorMode === 'mono_black'
+                    ? 'border-2 border-black text-black'
+                    : options.colorMode === 'grayscale'
                     ? 'grayscale'
                     : options.colorMode === 'ink_saver'
                     ? 'border border-slate-300'
@@ -522,9 +562,14 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
                       {options.watermark === 'NUMERIX_IOOC' ? (
                         <div className="flex flex-col items-center justify-center gap-2 transform -rotate-30 border-4 border-slate-300/40 px-10 py-5 rounded-3xl opacity-40">
-                          <NumerixLogo size="lg" variant="icon" isLight={true} />
+                          <NumerixLogo
+                            size="lg"
+                            variant="icon"
+                            isLight={true}
+                            monochrome={options.colorMode === 'mono_black' || options.colorMode === 'grayscale'}
+                          />
                           <span className="text-slate-500 font-black text-2xl md:text-3xl tracking-widest uppercase text-center font-sans">
-                            NUMERIX • IOOC-SHIRAZ OFFICE
+                            NUMERIX AUDIT
                           </span>
                         </div>
                       ) : (
@@ -538,23 +583,28 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                   <div className="relative z-10 flex flex-col h-full">
                     {/* 1. Header Section */}
                     {options.showCompanyHeader && (
-                      <div className="flex items-start justify-between border-b-2 border-slate-800 pb-4 mb-4">
+                      <div className={`flex items-start justify-between border-b-2 ${options.colorMode === 'mono_black' ? 'border-black' : 'border-slate-800'} pb-4 mb-4`}>
                         <div className="flex items-center gap-3">
                           {options.showLogo && (
                             <div className="shrink-0">
-                              <NumerixLogo size="sm" variant="horizontal" isLight={true} />
+                              <NumerixLogo
+                                size="sm"
+                                variant="horizontal"
+                                isLight={true}
+                                monochrome={options.colorMode === 'mono_black' || options.colorMode === 'grayscale'}
+                              />
                             </div>
                           )}
                           <div>
-                            <h1 className="text-base font-bold text-slate-900 tracking-tight leading-tight">
-                              {settings.companyName || 'IOOC - Shiraz Office'}
+                            <h1 className={`text-base font-bold ${options.colorMode === 'mono_black' ? 'text-black font-black' : 'text-slate-900'} tracking-tight leading-tight`}>
+                              {settings.companyName || 'Corporate Finance'}
                             </h1>
-                            <p className="text-[11px] text-slate-600">
+                            <p className={`text-[11px] ${options.colorMode === 'mono_black' ? 'text-black' : 'text-slate-600'}`}>
                               {settings.department || 'Finance & Accounting'} • Operator:{' '}
                               <strong>{settings.operatorName || 'N.Shaaeri'}</strong>
                             </p>
                             {options.memo && (
-                              <p className="text-[10px] italic text-slate-500 mt-0.5">
+                              <p className={`text-[10px] italic ${options.colorMode === 'mono_black' ? 'text-black font-medium' : 'text-slate-500'} mt-0.5`}>
                                 Memo: {options.memo}
                               </p>
                             )}
@@ -562,10 +612,10 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                         </div>
 
                         <div className="text-right">
-                          <h2 className="text-sm font-bold text-cyan-900 tracking-wider">
+                          <h2 className={`text-sm font-bold ${options.colorMode === 'mono_black' ? 'text-black font-black' : 'text-cyan-900'} tracking-wider`}>
                             {options.title}
                           </h2>
-                          <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                          <p className={`text-[10px] ${options.colorMode === 'mono_black' ? 'text-black font-medium' : 'text-slate-500'} font-mono mt-0.5`}>
                             Date: {currentDate} {currentTime}
                           </p>
                         </div>
@@ -575,7 +625,7 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                     {/* 2. Summary Metric Ribbon */}
                     {options.showSummaryRibbon && (
                       <div
-                        className="bg-white rounded-lg p-2.5 mb-4 border border-slate-300 text-[11px] font-mono grid grid-cols-4 gap-2 text-slate-900"
+                        className="bg-white rounded-lg p-2.5 mb-4 border border-slate-300 text-[11px] font-mono grid grid-cols-5 gap-2 text-slate-900"
                       >
                         <div>
                           <span className="block text-[9px] font-sans uppercase font-bold text-slate-600">
@@ -601,6 +651,14 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                         </div>
                         <div>
                           <span className="block text-[9px] font-sans uppercase font-bold text-slate-600">
+                            Min Value
+                          </span>
+                          <span className="font-bold text-xs text-slate-950">
+                            {formatAccountingNumber(min, settings.decimalPlaces, settings.numberFormat)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="block text-[9px] font-sans uppercase font-bold text-slate-600">
                             Max Value
                           </span>
                           <span className="font-bold text-xs">
@@ -619,11 +677,14 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                               <th className="py-1.5 px-2 w-8 text-center bg-white">#</th>
                             )}
                             {options.showTimestamps && (
-                              <th className="py-1.5 px-2 w-20 text-center font-mono bg-white">Time</th>
+                              <th className="py-1.5 px-2 w-24 text-center font-mono bg-white whitespace-nowrap">Time</th>
                             )}
                             <th className="py-1.5 px-2 bg-white">Mathematical Expression</th>
                             {options.showOperationTypes && (
                               <th className="py-1.5 px-2 w-24 text-center bg-white">Type</th>
+                            )}
+                            {options.showNotes && (
+                              <th className="py-1.5 px-2 text-left font-sans bg-white">Note</th>
                             )}
                             <th className="py-1.5 px-2 text-right bg-white">Result</th>
                           </tr>
@@ -646,17 +707,12 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                                   </td>
                                 )}
                                 {options.showTimestamps && (
-                                  <td className={`${paddingY} px-2 text-center text-slate-500 text-[10px] bg-white`}>
+                                  <td className={`${paddingY} px-2 text-center text-slate-500 text-[10px] bg-white whitespace-nowrap`}>
                                     {record.displayTime || ''}
                                   </td>
                                 )}
                                 <td className={`${paddingY} px-2 text-slate-900 font-sans font-medium bg-white`}>
                                   <div>{record.expression}</div>
-                                  {options.showNotes && record.note && (
-                                    <div className="text-[10px] text-cyan-700 italic font-sans mt-0.5">
-                                      📝 {record.note}
-                                    </div>
-                                  )}
                                 </td>
                                 {options.showOperationTypes && (
                                   <td className={`${paddingY} px-2 text-center bg-white`}>
@@ -665,6 +721,15 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                                         ? record.operationType.toUpperCase().replace('_', ' ')
                                         : 'MATH'}
                                     </span>
+                                  </td>
+                                )}
+                                {options.showNotes && (
+                                  <td className={`${paddingY} px-2 text-left font-sans text-slate-700 bg-white`}>
+                                    {record.note ? (
+                                      <span className="text-slate-800 font-normal">{record.note}</span>
+                                    ) : (
+                                      <span className="text-slate-300 select-none font-normal">—</span>
+                                    )}
                                   </td>
                                 )}
                                 <td className={`${paddingY} px-2 text-right font-bold text-slate-950 bg-white`}>
@@ -701,7 +766,7 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                     {/* 5. Document Page Footer */}
                     {options.showPageNumbers && (
                       <div className="pt-4 mt-4 border-t border-slate-200 flex items-center justify-between text-[9px] text-slate-400 font-sans">
-                        <span>IOOC-ShirazOffice | System Audit Tape</span>
+                        <span>System Audit Tape</span>
                         <span>Page 1 of 1</span>
                       </div>
                     )}

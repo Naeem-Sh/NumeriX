@@ -41,7 +41,6 @@ import {
   PanelLeft,
   LayoutGrid,
   FileSpreadsheet,
-  FileText,
   Sun,
   Moon,
 } from 'lucide-react';
@@ -1156,70 +1155,48 @@ export default function App() {
 
           {/* Right Header: Clean Essential Tools */}
           <div className="flex items-center gap-2 sm:gap-2.5">
-            {/* 2-Option Sound Toggle: Sound ON / OFF (Enter key only when ON) */}
+            {/* Sound Toggle (Icon-Only) */}
             <button
               id="header-sound-toggle-btn"
               onClick={handleToggleSound}
               title={
                 settings.soundEnabled
-                  ? 'Sound: ON (Audible tactile clicks) - Click to Mute'
-                  : 'Sound: OFF - Click to Turn Sound ON'
+                  ? 'Keypad Sound: ON - Click to Mute'
+                  : 'Keypad Sound: OFF - Click to Turn Sound ON'
               }
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
+              className={`p-2 rounded-lg border transition-colors cursor-pointer ${
                 settings.soundEnabled
                   ? isLight
-                    ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-900 shadow-2xs'
-                    : 'bg-emerald-950/50 hover:bg-emerald-900/70 border-emerald-700 text-emerald-300 shadow-xs'
+                    ? 'bg-white hover:bg-slate-100 border-slate-300 text-cyan-800 shadow-2xs'
+                    : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-emerald-400'
                   : isLight
-                  ? 'bg-slate-200/80 hover:bg-slate-200 border-slate-300 text-slate-500'
-                  : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-400'
+                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-400'
+                  : 'bg-slate-850 hover:bg-slate-800 border-slate-800 text-slate-500'
               }`}
             >
               {settings.soundEnabled ? (
-                <>
-                  <Volume2 className={`w-4 h-4 ${isLight ? 'text-cyan-700' : 'text-emerald-400'}`} />
-                  <span className="text-[11px]">Sound: ON</span>
-                </>
+                <Volume2 className="w-4 h-4" />
               ) : (
-                <>
-                  <VolumeX className="w-4 h-4 text-slate-400" />
-                  <span className="text-[11px]">Sound: OFF</span>
-                </>
+                <VolumeX className="w-4 h-4" />
               )}
             </button>
 
-            {/* 2-Option Theme Toggle: Light / Dark Mode */}
+            {/* Theme Toggle (Icon-Only) */}
             <button
               id="header-theme-btn"
               onClick={handleToggleTheme}
               title={`Switch Theme (Current: ${isLight ? 'Light Mode' : 'Dark Mode'}). Click to toggle.`}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
+              className={`p-2 rounded-lg border transition-colors cursor-pointer ${
                 isLight
-                  ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-900 shadow-2xs'
-                  : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+                  ? 'bg-white hover:bg-slate-100 border-slate-300 text-amber-600 shadow-2xs'
+                  : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-cyan-400'
               }`}
             >
               {isLight ? (
-                <Sun className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <Sun className="w-4 h-4" />
               ) : (
-                <Moon className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <Moon className="w-4 h-4" />
               )}
-              <span className="text-[11px]">{isLight ? 'LIGHT' : 'DARK'}</span>
-            </button>
-
-            {/* Quick PDF Report & Print Preview Button */}
-            <button
-              id="header-pdf-btn"
-              onClick={handleOpenPrintPreview}
-              title="Export calculation tape to PDF / Print Report (Ctrl+P)"
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer text-xs font-bold ${
-                isLight
-                  ? 'bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-900 shadow-2xs'
-                  : 'bg-rose-950/60 hover:bg-rose-900/80 border-rose-800 text-rose-300 shadow-xs'
-              }`}
-            >
-              <FileText className="w-4 h-4 text-rose-600" />
-              <span className="text-[11px]">PDF</span>
             </button>
 
             {/* Settings Button */}
@@ -1317,10 +1294,10 @@ export default function App() {
               />
 
               <div
-                className={`p-2.5 sm:p-3 lg:p-3.5 rounded-2xl border-2 transition-colors flex-1 flex flex-col justify-center min-h-0 ${
+                className={`p-2.5 sm:p-3 lg:p-3.5 rounded-2xl border transition-colors flex-1 flex flex-col justify-center min-h-0 ${
                   isLight
-                    ? 'bg-[#dedbd2] border-stone-300 shadow-xs'
-                    : 'bg-slate-900/95 border-slate-800 shadow-md'
+                    ? 'bg-[#dedbd2] border-stone-300 shadow-2xs'
+                    : 'bg-slate-900/95 border-slate-800 shadow-sm'
                 }`}
               >
                 <Keypad
@@ -1378,10 +1355,10 @@ export default function App() {
               />
 
               <div
-                className={`p-2.5 sm:p-3 lg:p-3.5 rounded-2xl border-2 transition-colors flex-1 flex flex-col justify-center min-h-0 ${
+                className={`p-2.5 sm:p-3 lg:p-3.5 rounded-2xl border transition-colors flex-1 flex flex-col justify-center min-h-0 ${
                   isLight
-                    ? 'bg-[#dedbd2] border-stone-300 shadow-xs'
-                    : 'bg-slate-900/95 border-slate-800 shadow-md'
+                    ? 'bg-[#dedbd2] border-stone-300 shadow-2xs'
+                    : 'bg-slate-900/95 border-slate-800 shadow-sm'
                 }`}
               >
                 <Keypad
@@ -1440,12 +1417,9 @@ export default function App() {
           isLight ? 'bg-[#dedbd2] border-stone-300 text-stone-800' : 'bg-slate-950/80 border-slate-850 text-slate-400'
         }`}
       >
-        <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex items-center justify-between text-[11px] sm:text-xs">
-          <div className="flex items-center gap-2 font-bold tracking-wider uppercase opacity-90">
-            <span>IOOC-ShirazOffice</span>
-          </div>
+        <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex items-center justify-end text-[11px] sm:text-xs">
           <div className="font-medium opacity-75">
-            Developed by: N.Shaaeri/A.Kanani
+            Developed by: N.Shaaeri
           </div>
         </div>
       </footer>

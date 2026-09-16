@@ -4,6 +4,7 @@ interface NumerixLogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   variant?: 'full' | 'icon' | 'horizontal';
   isLight?: boolean;
+  monochrome?: boolean;
   className?: string;
 }
 
@@ -11,6 +12,7 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
   size = 'md',
   variant = 'full',
   isLight = false,
+  monochrome = false,
   className = '',
 }) => {
   const sizeMap = {
@@ -23,13 +25,54 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
 
   const currentSize = sizeMap[size];
 
-  // The NumeriX SVG Emblem Symbol
-  const EmblemSvg = (
+  // The NumeriX SVG Emblem Symbol (Optimized for both Digital Full Color and Mono-Black Laser Printing)
+  const EmblemSvg = monochrome ? (
     <svg
       viewBox="0 0 200 200"
       width={currentSize.icon}
       height={currentSize.icon}
-      className="shrink-0 drop-shadow-sm"
+      className="shrink-0 print:text-black"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Pure Solid Black Vector Linework for Mono Printers (Zero Dithering, Zero Halftone Noise) */}
+      <path
+        d="M 62 38 C 45 42, 32 58, 30 78 C 28 98, 44 118, 62 135 L 75 147 C 88 160, 94 174, 85 182 C 76 190, 58 184, 45 168 C 35 155, 30 135, 34 116 C 31 138, 38 162, 54 176 C 70 189, 92 185, 102 168 C 112 150, 98 128, 82 110 L 68 95 C 54 80, 50 64, 58 52 C 67 40, 84 44, 98 58 L 105 65 C 92 48, 78 34, 62 38 Z"
+        fill="#000000"
+      />
+      <path
+        d="M 52 42 C 40 54, 38 72, 45 90 C 52 108, 68 124, 85 140 C 102 156, 118 170, 134 176 C 148 182, 160 174, 164 160 C 168 146, 158 132, 142 120 L 130 110 C 145 125, 155 140, 148 152 C 142 162, 128 162, 114 150 C 98 136, 82 118, 70 100 C 58 82, 52 64, 58 52 C 62 44, 68 40, 75 40 C 66 38, 58 38, 52 42 Z"
+        fill="#000000"
+      />
+      <path
+        d="M 65 178 C 80 186, 100 178, 115 160 C 130 142, 140 118, 152 95 L 170 58 L 184 68 L 186 24 L 142 30 L 155 43 L 138 76 C 128 96, 118 116, 106 132 C 94 148, 80 162, 65 178 Z"
+        fill="#000000"
+      />
+      <path
+        d="M 186 24 L 142 30 L 155 43 L 172 40 L 148 85 L 162 78 L 186 24 Z"
+        fill="#000000"
+      />
+      {/* Math symbols */}
+      <rect x="25" y="85" width="18" height="6" rx="3" fill="#000000" />
+      <rect x="31" y="79" width="6" height="18" rx="3" fill="#000000" />
+      <circle cx="168" cy="74" r="3.5" fill="#000000" />
+      <rect x="157" y="85" width="22" height="6" rx="3" fill="#000000" />
+      <circle cx="168" cy="102" r="3.5" fill="#000000" />
+      <g transform="translate(170, 52) rotate(45)">
+        <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#000000" />
+        <rect x="-2" y="-8" width="4" height="16" rx="2" fill="#000000" />
+      </g>
+      {/* Center Vortex */}
+      <polygon points="100,74 114,100 100,126 86,100" fill="#000000" />
+      <polygon points="100,78 110,100 100,122 90,100" fill="#ffffff" />
+      <text x="98" y="103" fontSize="10" fill="#000000" fontFamily="sans-serif" fontWeight="900" textAnchor="middle">×</text>
+    </svg>
+  ) : (
+    <svg
+      viewBox="0 0 200 200"
+      width={currentSize.icon}
+      height={currentSize.icon}
+      className="shrink-0 drop-shadow-sm print:drop-shadow-none"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -142,20 +185,32 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
           <div className="flex items-baseline tracking-tight font-black font-sans">
             <span
               className={`tracking-wider ${
-                isLight ? 'text-[#002855]' : 'text-cyan-400'
+                monochrome
+                  ? 'text-black print:text-black'
+                  : isLight
+                  ? 'text-[#002855] print:text-black'
+                  : 'text-cyan-400 print:text-black'
               } ${currentSize.text}`}
             >
               NUMERI
             </span>
             <span
-              className={`tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#F77F00] to-[#00A896] ${currentSize.text}`}
+              className={`tracking-wider ${
+                monochrome
+                  ? 'text-black font-black print:text-black'
+                  : `text-transparent bg-clip-text bg-gradient-to-r from-[#F77F00] to-[#00A896] print:text-black print:bg-none print:[-webkit-text-fill-color:initial]`
+              } ${currentSize.text}`}
             >
               X
             </span>
           </div>
           <span
             className={`font-sans tracking-[0.22em] uppercase font-bold ${
-              isLight ? 'text-slate-500' : 'text-slate-400'
+              monochrome
+                ? 'text-slate-800 print:text-black'
+                : isLight
+                ? 'text-slate-500 print:text-slate-700'
+                : 'text-slate-400 print:text-slate-700'
             } ${currentSize.subtext}`}
           >
             WEB CALCULATOR
@@ -173,20 +228,32 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
         <div className="flex items-baseline tracking-tight font-black font-sans">
           <span
             className={`tracking-wider ${
-              isLight ? 'text-[#002855]' : 'text-cyan-400'
+              monochrome
+                ? 'text-black print:text-black'
+                : isLight
+                ? 'text-[#002855] print:text-black'
+                : 'text-cyan-400 print:text-black'
             } ${currentSize.text}`}
           >
             NUMERI
           </span>
           <span
-            className={`tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#F77F00] to-[#00A896] ${currentSize.text}`}
+            className={`tracking-wider ${
+              monochrome
+                ? 'text-black font-black print:text-black'
+                : `text-transparent bg-clip-text bg-gradient-to-r from-[#F77F00] to-[#00A896] print:text-black print:bg-none print:[-webkit-text-fill-color:initial]`
+            } ${currentSize.text}`}
           >
             X
           </span>
         </div>
         <span
           className={`font-sans tracking-[0.24em] uppercase font-bold mt-0.5 ${
-            isLight ? 'text-slate-500' : 'text-slate-400'
+            monochrome
+              ? 'text-slate-800 print:text-black'
+              : isLight
+              ? 'text-slate-500 print:text-slate-700'
+              : 'text-slate-400 print:text-slate-700'
           } ${currentSize.subtext}`}
         >
           WEB CALCULATOR
