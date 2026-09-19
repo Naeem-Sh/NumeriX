@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { playKeySound } from '../utils/audio';
 import { DEFAULT_SETTINGS, WorkspaceBackupData, downloadWorkspaceBackup, restoreWorkspaceBackup } from '../utils/storage';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -662,6 +663,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             </div>
           </div>
+ 
+          {/* Progressive Web App / Desktop Application Card */}
+          <PWAInstallButton isLight={isLight} variant="menu-item" />
 
           {/* Zero-Maintenance Workspace Backup & Restore (JSON) */}
           <div className={`p-4 rounded-xl border space-y-3 ${

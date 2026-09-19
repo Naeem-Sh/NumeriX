@@ -29,6 +29,8 @@ import { SettingsModal } from './components/SettingsModal';
 import { HelpModal } from './components/HelpModal';
 import { PrintPreviewModal } from './components/PrintPreviewModal';
 import { NumerixLogo } from './components/NumerixLogo';
+import { PWAInstallButton } from './components/PWAInstallButton';
+import { OfflineIndicator } from './components/OfflineIndicator';
 
 import {
   Settings as SettingsIcon,
@@ -1199,6 +1201,9 @@ export default function App() {
               )}
             </button>
 
+            {/* Desktop App Install Button */}
+            <PWAInstallButton isLight={isLight} />
+
             {/* Settings Button */}
             <button
               id="header-settings-btn"
@@ -1413,13 +1418,32 @@ export default function App() {
       {/* 3. Footer */}
       <footer
         id="app-footer-bar"
-        className={`w-full py-1.5 px-4 sm:px-6 lg:px-8 border-t text-center select-none transition-colors shrink-0 ${
-          isLight ? 'bg-[#dedbd2] border-stone-300 text-stone-800' : 'bg-slate-950/80 border-slate-850 text-slate-400'
+        className={`w-full py-2 px-4 sm:px-6 lg:px-8 border-t select-none transition-colors shrink-0 ${
+          isLight ? 'bg-[#dedbd2] border-stone-300' : 'bg-slate-950/80 border-slate-850'
         }`}
       >
-        <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex items-center justify-end text-[11px] sm:text-xs">
-          <div className="font-medium opacity-75">
-            Developed by: N.Shaaeri
+        <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex items-center justify-between">
+          {/* Version badge with active status dot */}
+          <div
+            id="footer-version-badge"
+            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-xs font-mono font-medium transition-colors ${
+              isLight
+                ? 'bg-stone-200/80 border-stone-300 text-stone-700 shadow-2xs'
+                : 'bg-slate-900 border-slate-800 text-slate-300'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+            <span>v{__APP_VERSION__}</span>
+          </div>
+
+          {/* Author attribution */}
+          <div
+            id="footer-author-attribution"
+            className={`text-xs font-medium tracking-tight ${
+              isLight ? 'text-stone-700' : 'text-slate-400'
+            }`}
+          >
+            Developed by : N.Shaaeri
           </div>
         </div>
       </footer>
@@ -1457,6 +1481,9 @@ export default function App() {
         records={tapeRecords}
         settings={settings}
       />
+
+      {/* 100% Offline Mode Banner */}
+      <OfflineIndicator />
     </div>
   );
 }
