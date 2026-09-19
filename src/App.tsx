@@ -1422,7 +1422,7 @@ export default function App() {
           isLight ? 'bg-[#dedbd2] border-stone-300' : 'bg-slate-950/80 border-slate-850'
         }`}
       >
-        <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex items-center justify-between">
+        <div className="w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] 3xl:max-w-[1920px] mx-auto flex items-center justify-start">
           {/* Version badge with active status dot */}
           <div
             id="footer-version-badge"
@@ -1434,16 +1434,6 @@ export default function App() {
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
             <span>v{__APP_VERSION__}</span>
-          </div>
-
-          {/* Author attribution */}
-          <div
-            id="footer-author-attribution"
-            className={`text-xs font-medium tracking-tight ${
-              isLight ? 'text-stone-700' : 'text-slate-400'
-            }`}
-          >
-            Developed by : N.Shaaeri
           </div>
         </div>
       </footer>
