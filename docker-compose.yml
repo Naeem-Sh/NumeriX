@@ -5,15 +5,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: iooc-accountant-calculator
+    container_name: numerix-calculator
     restart: unless-stopped
     ports:
-      - "${PORT:-9330}:${PORT:-9330}"
+      - "${PORT:-9330}:3000"
     environment:
-      - PORT=${PORT:-9330}
       - NODE_ENV=production
+      - NUMERIX_DATA_DIR=/data/numerix
+    volumes:
+      - numerix_data:/data/numerix
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:${PORT:-9330}/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -23,3 +25,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+volumes:
+  numerix_data:
+    name: numerix_data_persistent

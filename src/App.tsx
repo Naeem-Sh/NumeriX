@@ -7,6 +7,7 @@ import {
   loadStoredTape,
   saveStoredTape,
   saveStoredLogo,
+  syncFromExternalStorage,
 } from './utils/storage';
 import {
   evaluateExpression,
@@ -102,6 +103,17 @@ export default function App() {
   // Reference for active key flash timeout
   const keyFlashTimeout = useRef<number | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
+
+  // Initial sync from persistent external storage (outside project folder)
+  useEffect(() => {
+    syncFromExternalStorage().then((data) => {
+      if (data) {
+        if (data.settings) setSettings(data.settings);
+        if (Array.isArray(data.tape) && data.tape.length > 0) setTapeRecords(data.tape);
+        if (data.logo !== undefined) saveStoredLogo(data.logo);
+      }
+    });
+  }, []);
 
   // Persist settings
   useEffect(() => {

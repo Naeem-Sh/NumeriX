@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { CalculatorSettings, AppTheme, NumberFormatType, DateFormatType, WorkspaceLayout } from '../types';
 import {
   X,
@@ -18,9 +18,19 @@ import {
   Download,
   Upload,
   ShieldCheck,
+  HardDrive,
+  RefreshCw,
 } from 'lucide-react';
 import { playKeySound } from '../utils/audio';
-import { DEFAULT_SETTINGS, WorkspaceBackupData, downloadWorkspaceBackup, restoreWorkspaceBackup } from '../utils/storage';
+import {
+  DEFAULT_SETTINGS,
+  WorkspaceBackupData,
+  downloadWorkspaceBackup,
+  restoreWorkspaceBackup,
+  fetchStorageInfo,
+  StorageInfo,
+  triggerExternalSync,
+} from '../utils/storage';
 import { PWAInstallButton } from './PWAInstallButton';
 
 interface SettingsModalProps {
@@ -42,6 +52,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [restoreStatus, setRestoreStatus] = useState<{ message: string; isError: boolean } | null>(null);
+  const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchStorageInfo().then((info) => {
+        if (info) setStorageInfo(info);
+      });
+    }
+  }, [isOpen]);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    triggerExternalSync();
+    setTimeout(async () => {
+      const info = await fetchStorageInfo();
+      if (info) setStorageInfo(info);
+      setIsSyncing(false);
+    }, 600);
+  };
 
   if (!isOpen) return null;
 
@@ -666,6 +696,62 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
  
           {/* Progressive Web App / Desktop Application Card */}
           <PWAInstallButton isLight={isLight} variant="menu-item" />
+
+          {/* Persistent Data Storage (Outside Project Directory) */}
+          <div
+            id="external-persistent-storage-card"
+            className={`p-4 rounded-xl border space-y-3 transition-colors ${
+              isLight ? 'bg-emerald-50/50 border-emerald-300 text-stone-900' : 'bg-emerald-950/20 border-emerald-800/60 text-slate-100'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                  <HardDrive className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold text-xs sm:text-sm text-emerald-800 dark:text-emerald-300">
+                      محل ذخیره‌سازی داده‌ها (خارج از پوشه پروژه)
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      محفوظ در برابر حذف و آپدیت برنامه
+                    </span>
+                  </div>
+                  <p className={`text-[11px] mt-0.5 ${isLight ? 'text-stone-600' : 'text-slate-400'}`}>
+                    تمامی محاسبات، نوار کاغذی و تنظیمات شما به صورت خودکار در این مسیر خارج از پوشه پروژه ذخیره می‌شوند.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleManualSync}
+                disabled={isSyncing}
+                title="همگام‌سازی دستی"
+                className={`p-1.5 rounded-lg border text-xs flex items-center gap-1 transition-colors cursor-pointer shrink-0 ${
+                  isLight
+                    ? 'border-stone-300 bg-white hover:bg-stone-50 text-stone-700'
+                    : 'border-slate-700 bg-slate-800 hover:bg-slate-750 text-slate-200'
+                }`}
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-emerald-500' : 'text-emerald-600 dark:text-emerald-400'}`} />
+                <span className="text-[10px] font-medium">همگام‌سازی</span>
+              </button>
+            </div>
+
+            <div className={`p-2.5 rounded-lg border font-mono text-[11px] break-all select-all flex items-center justify-between gap-2 ${
+              isLight ? 'bg-white border-stone-300 text-stone-800' : 'bg-slate-900 border-slate-800 text-emerald-400'
+            }`}>
+              <span dir="ltr">{storageInfo?.dataFile || '~/.numerix/calculator-data.json'}</span>
+              <span className={`text-[10px] font-sans px-1.5 py-0.5 rounded shrink-0 ${
+                isLight ? 'bg-stone-100 text-stone-600' : 'bg-slate-800 text-slate-400'
+              }`}>
+                {storageInfo?.recordsCount !== undefined ? `${storageInfo.recordsCount} رکورد` : 'ذخیره خودکار'}
+              </span>
+            </div>
+          </div>
 
           {/* Zero-Maintenance Workspace Backup & Restore (JSON) */}
           <div className={`p-4 rounded-xl border space-y-3 ${

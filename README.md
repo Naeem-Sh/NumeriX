@@ -1,21 +1,27 @@
-<img src="./logo1.png" alt="Project Logo" width="200">
+<p align="center">
+  <img src="./logo1.png" alt="NumeriX Logo" width="180">
+</p>
 
-# Professional Accountant Calculator
+# NumeriX — Professional Financial Calculator & Audit Tape
 
-A high-precision, desktop-grade financial and accounting calculator application tailored for accountants, auditors, and office professionals. Designed for speed, keyboard ergonomics, precision numeric handling, 20-line tape audit history, Excel `.xlsx` and PDF report generation, analog clock, and custom organization branding.
+> **Version:** 2.0.1  
+> **Target:** Modern Web, Desktop PWA, and Dockerized Self-Hosted Appliance  
+> **Author:** N.Shaaeri (ShirazOffice)
+
+A desktop-grade financial and accounting calculator application tailored for accountants, auditors, financial controllers, and office professionals. Designed for high precision, keyboard ergonomics, 32-digit decimal mathematics (`Decimal.js`), real-time 20-line paper audit tape, one-click Excel `.xlsx` and PDF report generation, analog clock, and resilient persistent storage.
 
 ---
 
 ## 🌟 Key Features
 
-- **Accurate Decimal Engine**: High-precision 32-digit decimal calculation via `Decimal.js`, avoiding standard IEEE floating-point errors (e.g. `0.1 + 0.2`).
+- **High-Precision Decimal Engine**: 32-digit floating-point error-free calculations via `Decimal.js` (eliminates JavaScript `0.1 + 0.2` rounding inaccuracies).
 - **20-Line Paper Tape / Audit History**: Real-time record of all mathematical expressions, timestamps, operations, and intermediate results. Supports line reuse, single-item copying, and clearing.
 - **Configurable 3-Digit Number Formatting**:
   - `1,234,567.89` (Standard US/UK/International)
   - `1.234.567,89` (European / Latin)
   - `1 234 567.89` (International SI)
   - `1'234'567.89` (Swiss Accounting)
-- **Decimal Precision Controls**: Instant `DEC −` and `DEC +` buttons to adjust precision dynamically (0 to 8 places).
+- **Decimal Precision Controls**: Instant `DEC −` and `DEC +` buttons to adjust precision dynamically (0 to 8 decimal places).
 - **Accounting & Tax Functions**:
   - `TAX+` (Add tax percentage)
   - `TAX−` (Extract pre-tax net amount from gross)
@@ -27,83 +33,127 @@ A high-precision, desktop-grade financial and accounting calculator application 
 - **Excel & Spreadsheet Integration**:
   - One-click client-side export to formatted Excel `.xlsx` workbook with columnar metadata and summary statistics.
   - **Copy for Excel (TSV)**: Paste directly into Excel columns with `Ctrl+V`.
-  - **Raw # Copy**: Copy unformatted numbers without commas for raw calculation formulas.
-- **Accountant-Grade PDF Audit Reports**:
-  - Generates downloadable, print-ready PDF reports with organization branding, date/time, structured audit table, and official sign-off footer.
-- **Analog Clock & Live Date**: Real-time analog clock with smooth second hand and local calendar date.
-- **Custom Branding & Logo Upload**: Upload custom company logo (PNG, JPG, SVG, WebP) stored client-side.
-- **Subtle Keystroke Audio**: Non-fatiguing Web Audio synthesized feedback with toggle and volume controls.
-- **Docker Deployment on Port 9330**: Production-ready containerized deployment.
+  - **Raw # Copy**: Copy unformatted numbers without commas for formula pasting.
+- **Accountant-Grade PDF Audit Reports**: Print-ready PDF reports with organization branding, date/time, structured audit table, and official sign-off footer.
+- **Resilient Persistent Storage (Outside Project Directory)**: All tape history, custom branding, and settings automatically synchronize to safe storage (`~/.numerix` or Docker volume) so data is never lost on application updates or deletions.
+- **Progressive Web App (PWA)**: Installable as a native desktop or mobile application with full offline support.
 
 ---
 
 ## 🚀 Docker Deployment
 
-The application is pre-configured to run in Docker and bind to **port 9330**.
+The application is completely containerized with a production multi-stage Alpine Node.js container.
 
-### Method 1: Using Docker Compose (Recommended)
+### Option A: Using Docker Compose (Recommended)
 
-1. Clone the repository or navigate to the application folder:
-   ```bash
-   cd accountant-calculator
-   ```
-
-2. Start the container in detached mode:
+1. **Start the application**:
    ```bash
    docker compose up -d --build
    ```
 
-3. Access the calculator in your browser:
+2. **Access in browser**:
    ```text
-   http://SERVER-IP:9330
+   http://localhost:9330
    ```
+   *(Or on your server: `http://<SERVER_IP>:9330`)*
 
-### Method 2: Using Docker CLI
-
-1. Build the Docker image:
+3. **Stop the container**:
    ```bash
-   docker build -t iooc-accountant-calculator .
+   docker compose down
    ```
 
-2. Run the container on port 9330:
+> **Data Persistence**: Docker Compose automatically provisions a persistent named volume (`numerix_data_persistent` mapped to `/data/numerix`). All calculations, paper tape records, and settings remain safe across container teardowns, rebuilds, and updates.
+
+### Option B: Using Docker CLI
+
+1. **Build the image**:
    ```bash
-   docker run -d --name accountant-calculator -p 9330:9330 --restart unless-stopped iooc-accountant-calculator
+   docker build -t numerix-calculator:2.0.1 .
    ```
 
-3. Open `http://localhost:9330` in your web browser.
+2. **Run container with persistent volume**:
+   ```bash
+   docker run -d \
+     --name numerix-calculator \
+     -p 9330:3000 \
+     -v numerix_data:/data/numerix \
+     --restart unless-stopped \
+     numerix-calculator:2.0.1
+   ```
 
----
+3. **Check container health**:
+   ```bash
+   docker ps
+   ```
 
-## ⚙️ Custom Port Configuration
+### Custom Port Configuration
 
-To change the default port from `9330` to another port (e.g. `8080`):
-
-### With Docker Compose:
-Set the `PORT` environment variable before running `docker compose`:
+To bind the calculator to a different host port (e.g. `8080` instead of `9330`):
 ```bash
 PORT=8080 docker compose up -d
 ```
-Or create a `.env` file:
-```env
-PORT=8080
+
+---
+
+## 📦 How to Push to GitHub
+
+Follow these steps to send this project to a new or existing GitHub repository:
+
+### Step 1: Initialize Git (if not already done)
+```bash
+git init
+git add .
+git commit -m "feat: release NumeriX v2.0.1 production ready"
 ```
 
-### With Docker CLI:
+### Step 2: Link to Your GitHub Repository
+Replace `<YOUR_USERNAME>` and `<REPO_NAME>` with your GitHub information:
 ```bash
-docker run -d --name accountant-calculator -e PORT=8080 -p 8080:8080 iooc-accountant-calculator
+git remote add origin https://github.com/<YOUR_USERNAME>/<REPO_NAME>.git
+git branch -M main
+```
+
+### Step 3: Push to GitHub
+```bash
+git push -u origin main
+```
+
+### Step 4: Create a Release Tag (Optional)
+The included GitHub Actions workflow (`.github/workflows/release.yml`) automatically generates a GitHub Release whenever you push a version tag:
+```bash
+git tag v2.0.1
+git push origin v2.0.1
 ```
 
 ---
 
-## 🔄 Updating the Container
+## 💻 Local Development (Without Docker)
 
-To update the running container with the latest codebase:
+### Prerequisites
+- Node.js 20+
+- npm 10+
 
-```bash
-docker compose down
-docker compose pull
-docker compose up -d --build
-```
+### Steps
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Run in development mode**:
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:3000`.
+
+3. **Build for production**:
+   ```bash
+   npm run build
+   ```
+
+4. **Start production server**:
+   ```bash
+   npm start
+   ```
 
 ---
 
@@ -131,40 +181,8 @@ docker compose up -d --build
 
 ---
 
-## 📊 Excel & PDF Export
-
-### Excel Export (`.xlsx`)
-- Click **"Export .XLSX"** in the top bar or tape footer.
-- Generates a structured spreadsheet containing Line #, Date, Time, Expression, Numeric Result, Formatted Result, and Operation Type.
-- Includes automatic summary formulas: Sum of Results, Average, Max, and Min.
-
-### PDF Report
-- Click **"PDF Report"** in the top bar or tape footer.
-- Creates an A4 accountant audit report with header branding, company metadata, tabular calculation history, summary metrics, page numbers, and official sign-off footer.
-
----
-
-## 💾 Local Storage & Backup Considerations
-
-- All calculation records, custom logos, and user preferences (theme, decimal places, tax rate) are stored **100% locally in the browser** (`localStorage` / `IndexedDB`).
-- **No external server or database connection is required** during normal operation.
-- To back up your calculation history, use the **"Export .XLSX"** or **"Copy for Excel"** function before clearing browser cache.
-
----
-
-## 🔧 Troubleshooting
-
-| Issue | Resolution |
-|---|---|
-| Port 9330 is already in use | Change port using `PORT=YOUR_PORT docker compose up -d`. |
-| Sound effects not playing | Click anywhere inside the application to initialize the browser's Web Audio context, or check the Sound toggle in the top bar. |
-| Numbers showing unexpected decimal places | Use the `DEC −` and `DEC +` buttons or press `[` and `]` to adjust the precision. |
-| Logo appears distorted | Upload standard aspect ratio images (PNG, JPG, SVG, WebP) under 2MB. |
-
----
-
-## 🏢 Organization & Credits
+## 🏢 Organization & License
 
 - **Organization**: ShirazOffice
-- **Developer / Author**: By: N.Shaaeri
-- **License**: Proprietary / Office Enterprise
+- **Developer / Author**: N.Shaaeri
+- **License**: MIT
