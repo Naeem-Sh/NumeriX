@@ -4,7 +4,7 @@
 
 # NumeriX — Professional Financial Calculator & Audit Tape
 
-> **Version:** 2.0.1  
+> **Version:** 2.3.0  
 > **Target:** Modern Web, Desktop PWA, and Dockerized Self-Hosted Appliance  
 > **Author:** N.Shaaeri (ShirazOffice)
 
@@ -68,7 +68,7 @@ The application is completely containerized with a production multi-stage Alpine
 
 1. **Build the image**:
    ```bash
-   docker build -t numerix-calculator:2.0.1 .
+   docker build -t numerix-calculator:2.3.0 .
    ```
 
 2. **Run container with persistent volume**:
@@ -78,7 +78,7 @@ The application is completely containerized with a production multi-stage Alpine
      -p 9330:3000 \
      -v numerix_data:/data/numerix \
      --restart unless-stopped \
-     numerix-calculator:2.0.1
+     numerix-calculator:2.3.0
    ```
 
 3. **Check container health**:
@@ -103,7 +103,7 @@ Follow these steps to send this project to a new or existing GitHub repository:
 ```bash
 git init
 git add .
-git commit -m "feat: release NumeriX v2.0.1 production ready"
+git commit -m "feat: release NumeriX v2.3.0 production ready"
 ```
 
 ### Step 2: Link to Your GitHub Repository
@@ -121,8 +121,8 @@ git push -u origin main
 ### Step 4: Create a Release Tag (Optional)
 The included GitHub Actions workflow (`.github/workflows/release.yml`) automatically generates a GitHub Release whenever you push a version tag:
 ```bash
-git tag v2.0.1
-git push origin v2.0.1
+git tag v2.3.0
+git push origin v2.3.0
 ```
 
 ---

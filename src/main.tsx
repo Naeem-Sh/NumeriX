@@ -1,6 +1,6 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
-// Embedded Fonts for 100% Offline / Airplane-Mode execution
+// Embedded Fonts for 100% Offline / Airplane-Mode execution (Air-Gapped Intranet)
 import '@fontsource/plus-jakarta-sans/400.css';
 import '@fontsource/plus-jakarta-sans/500.css';
 import '@fontsource/plus-jakarta-sans/600.css';
@@ -11,6 +11,11 @@ import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/600.css';
 import '@fontsource/jetbrains-mono/700.css';
 import '@fontsource/jetbrains-mono/800.css';
+import '@fontsource/vazirmatn/400.css';
+import '@fontsource/vazirmatn/500.css';
+import '@fontsource/vazirmatn/600.css';
+import '@fontsource/vazirmatn/700.css';
+import '@fontsource/vazirmatn/800.css';
 
 import App from './App.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';

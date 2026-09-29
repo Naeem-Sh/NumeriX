@@ -51,7 +51,7 @@ export function triggerExternalSync(): void {
   syncDebounceTimer = setTimeout(async () => {
     try {
       const payload: WorkspaceBackupData = {
-        version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '2.0.1',
+        version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '2.3.0',
         exportedAt: new Date().toISOString(),
         app: 'NumeriX Financial Calculator',
         settings: loadStoredSettings(),

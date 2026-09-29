@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for NumeriX Financial Calculator (v2.0.1)
+# Multi-stage Dockerfile for NumeriX Financial Calculator (v2.3.0)
 # Stage 1: Build production frontend & server bundle
 FROM node:20-alpine AS builder
 

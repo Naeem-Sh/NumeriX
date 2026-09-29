@@ -8,7 +8,7 @@ import packageJson from './package.json';
 export default defineConfig(() => {
   return {
     define: {
-      __APP_VERSION__: JSON.stringify(packageJson.version || '2.1.0'),
+      __APP_VERSION__: JSON.stringify(packageJson.version || '2.3.0'),
     },
     plugins: [
       react(),
