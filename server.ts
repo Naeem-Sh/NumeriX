@@ -1,132 +1,98 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
-import { createServer as createViteServer } from 'vite';
 
 const app = express();
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
+// Ensure socket binds to a valid network interface (defaults to 0.0.0.0), ignoring arbitrary hostname labels
+const rawHost = process.env.BIND_HOST || process.env.HOST || '0.0.0.0';
+const HOST = /^(?:\d{1,3}\.){3}\d{1,3}$|^::$/.test(rawHost) || rawHost === 'localhost' ? rawHost : '0.0.0.0';
 
-// Persistent data directory OUTSIDE the project folder
-// Uses NUMERIX_DATA_DIR environment variable if provided, or default user home directory ~/.numerix
-const DATA_DIR = process.env.NUMERIX_DATA_DIR || path.join(os.homedir(), '.numerix');
-const DATA_FILE = path.join(DATA_DIR, 'calculator-data.json');
+// Determine dist directory path reliably in both development and bundled production
+const distDir = fs.existsSync(path.resolve(process.cwd(), 'dist'))
+  ? path.resolve(process.cwd(), 'dist')
+  : path.resolve(__dirname, 'dist');
 
-// Ensure external directory exists
-try {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-} catch (err) {
-  console.warn('Could not initialize external storage directory:', DATA_DIR, err);
-}
+// Enable reverse proxy support (X-Forwarded-For, X-Forwarded-Proto)
+app.set('trust proxy', true);
 
-app.use(express.json({ limit: '25mb' }));
+// Standard Security & Performance Headers
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
 
-// 1. API: Get storage status and file path info
-app.get('/api/storage/info', (req, res) => {
-  let fileExists = false;
-  let fileSizeBytes = 0;
-  let lastSaved: string | null = null;
-  let recordsCount = 0;
-
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const stat = fs.statSync(DATA_FILE);
-      fileExists = true;
-      fileSizeBytes = stat.size;
-      lastSaved = stat.mtime.toISOString();
-
-      const raw = fs.readFileSync(DATA_FILE, 'utf-8');
-      const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.tape)) {
-        recordsCount = parsed.tape.length;
-      }
-    }
-  } catch (e) {
-    console.error('Error reading storage info:', e);
-  }
-
-  res.json({
-    status: 'ok',
-    isExternal: true,
-    dataDirectory: DATA_DIR,
-    dataFile: DATA_FILE,
-    fileExists,
-    fileSizeBytes,
-    lastSaved,
-    recordsCount,
-    homedir: os.homedir(),
+// Dedicated Air-Gapped Healthcheck Endpoints
+app.get(['/health', '/healthz'], (_req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    app: 'NumeriX Financial Calculator',
+    version: '2.3.1',
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.floor(process.uptime()),
   });
 });
 
-// 2. API: Load data from external file
-app.get('/api/storage/data', (req, res) => {
-  try {
-    if (!fs.existsSync(DATA_FILE)) {
-      return res.json({ success: true, data: null, message: 'No external file exists yet.' });
+// Serve static assets with cache headers
+if (fs.existsSync(distDir)) {
+  // Long-term caching for immutable hashed assets
+  app.use(
+    '/assets',
+    express.static(path.join(distDir, 'assets'), {
+      maxAge: '1y',
+      immutable: true,
+    })
+  );
+
+  // General static file serving (favicons, manifest, etc.)
+  app.use(
+    express.static(distDir, {
+      maxAge: '1h',
+      index: false,
+    })
+  );
+
+  // Single-Page Application (SPA) fallback - serve index.html for any unhandled GET route
+  app.get('*', (_req, res) => {
+    const indexPath = path.join(distDir, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send('Application bundle not found. Please build the frontend first.');
     }
-    const raw = fs.readFileSync(DATA_FILE, 'utf-8');
-    const parsed = JSON.parse(raw);
-    res.json({ success: true, data: parsed });
-  } catch (err: any) {
-    res.status(500).json({ success: false, error: err?.message || 'Failed to read external data file' });
-  }
-});
-
-// 3. API: Save data to external file outside project
-app.post('/api/storage/data', (req, res) => {
-  try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    const payload = req.body;
-    // Write atomically with safe formatting
-    const jsonStr = JSON.stringify(payload, null, 2);
-    fs.writeFileSync(DATA_FILE, jsonStr, 'utf-8');
-
-    res.json({
-      success: true,
-      dataFile: DATA_FILE,
-      savedAt: new Date().toISOString(),
-      bytes: jsonStr.length,
-    });
-  } catch (err: any) {
-    res.status(500).json({ success: false, error: err?.message || 'Failed to write to external data file' });
-  }
-});
-
-// Health check endpoints
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', time: new Date().toISOString(), storageFile: DATA_FILE });
-});
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', time: new Date().toISOString() });
-});
-
-async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: {
-        middlewareMode: true,
-        hmr: process.env.DISABLE_HMR !== 'true',
-      },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
-
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
-    console.log(`Data stored outside project folder at: ${DATA_FILE}`);
+  });
+} else {
+  app.get('*', (_req, res) => {
+    res.status(503).send('Application build in progress or dist directory missing.');
   });
 }
 
-startServer();
+// Start HTTP Server
+const server = app.listen(PORT, HOST, () => {
+  console.log(`[NumeriX] Production server listening on http://${HOST}:${PORT}`);
+  console.log(`[NumeriX] Air-gapped runtime ready. Healthcheck available at /healthz`);
+});
+
+// POSIX Signal Handling for Graceful Shutdown
+const handleShutdown = (signal: string) => {
+  console.log(`[NumeriX] Received ${signal}. Initiating graceful shutdown...`);
+  server.close(() => {
+    console.log('[NumeriX] HTTP server terminated cleanly.');
+    process.exit(0);
+  });
+
+  // Force shutdown if connections do not drain in 5 seconds
+  setTimeout(() => {
+    console.error('[NumeriX] Forced termination due to timeout.');
+    process.exit(1);
+  }, 5000).unref();
+};
+
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+process.on('SIGINT', () => handleShutdown('SIGINT'));
+
+export default app;

@@ -2,25 +2,95 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>NumeriX</title>
     <meta name="description" content="NumeriX - Professional desktop-grade financial calculator with audit tape history, precision decimal controls, and Excel/PDF export." />
     <meta property="og:title" content="NumeriX" />
     <meta property="og:description" content="Accountant-focused financial calculator with full keyboard and numeric keypad support." />
     
-    <!-- PWA & Mobile Web App Capabilities -->
-    <meta name="theme-color" content="#020617" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="NumeriX" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #020617;
+        color: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        overflow-x: hidden;
+      }
+      #root {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .initial-loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        gap: 12px;
+        color: #06b6d4;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .initial-spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid rgba(6, 182, 212, 0.2);
+        border-top-color: #06b6d4;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+
+    <script>
+      // Immediate Self-Healing & Service Worker Purge
+      (function() {
+        try {
+          if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+              if (registrations && registrations.length > 0) {
+                var unregisterList = registrations.map(function(reg) {
+                  return reg.unregister();
+                });
+                Promise.all(unregisterList).then(function() {
+                  if (typeof window !== 'undefined' && 'caches' in window) {
+                    caches.keys().then(function(keys) {
+                      Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
+                        var hasReloaded = sessionStorage.getItem('sw_purged_ok');
+                        if (!hasReloaded) {
+                          sessionStorage.setItem('sw_purged_ok', 'true');
+                          window.location.reload();
+                        }
+                      });
+                    });
+                  }
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('SW purge check:', e);
+        }
+      })();
+    </script>
   </head>
   <body class="bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-white">
-    <div id="root"></div>
+    <div id="root">
+      <div class="initial-loader">
+        <div class="initial-spinner"></div>
+        <span>NumeriX Calculator...</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

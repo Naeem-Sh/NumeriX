@@ -1,14 +1,19 @@
-import * as XLSX from 'xlsx';
 import { CalculationRecord, CalculatorSettings } from '../types';
 
-export function exportTapeToExcel(
+/**
+ * Lazy-loads XLSX and exports the audit tape to an Excel spreadsheet.
+ * Loading xlsx on-demand keeps the initial applet bundle lightweight and fast.
+ */
+export async function exportTapeToExcel(
   records: CalculationRecord[],
   settings: CalculatorSettings
-): void {
+): Promise<void> {
   if (records.length === 0) {
-    alert('Tape history is empty. Make calculations before exporting.');
     return;
   }
+
+  // Dynamic on-demand import of xlsx
+  const XLSX = await import('xlsx');
 
   // 1. Prepare Meta header info
   const dateStr = new Date().toLocaleDateString('en-US', {
@@ -23,9 +28,9 @@ export function exportTapeToExcel(
   });
 
   const headerRows = [
-    ['ORGANIZATION:', settings.companyName || 'Corporate Finance'],
-    ['DEPARTMENT:', settings.department || 'Finance & Accounting'],
-    ['OPERATOR:', settings.operatorName || 'N.Shaaeri'],
+    ['ORGANIZATION:', settings.companyName || 'Company / Organization'],
+    ['DEPARTMENT:', settings.department || 'Accounting Department'],
+    ['OPERATOR:', settings.operatorName || 'Authorized Auditor'],
     ['REPORT TITLE:', 'CALCULATION AUDIT & TAPE REPORT'],
     ['GENERATED ON:', `${dateStr} at ${timeStr}`],
     ['DECIMAL PRECISION DEFAULT:', `${settings.decimalPlaces} Places`],

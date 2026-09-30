@@ -440,7 +440,7 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                     }`}
                   >
                     <option value="NONE">None (Clean Background)</option>
-                    <option value="NUMERIX_IOOC">NumeriX Logo Watermark</option>
+                    <option value="NUMERIX">NumeriX Logo Watermark</option>
                     <option value="CONFIDENTIAL">CONFIDENTIAL</option>
                     <option value="DRAFT">DRAFT</option>
                     <option value="AUDITED">AUDITED</option>
@@ -560,7 +560,7 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                   {/* Watermark Overlay */}
                   {options.watermark !== 'NONE' && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
-                      {options.watermark === 'NUMERIX_IOOC' ? (
+                      {options.watermark === 'NUMERIX' ? (
                         <div className="flex flex-col items-center justify-center gap-2 transform -rotate-30 border-4 border-slate-300/40 px-10 py-5 rounded-3xl opacity-40">
                           <NumerixLogo
                             size="lg"
@@ -597,11 +597,11 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                           )}
                           <div>
                             <h1 className={`text-base font-bold ${options.colorMode === 'mono_black' ? 'text-black font-black' : 'text-slate-900'} tracking-tight leading-tight`}>
-                              {settings.companyName || 'Corporate Finance'}
+                              {settings.companyName || 'Company / Organization'}
                             </h1>
                             <p className={`text-[11px] ${options.colorMode === 'mono_black' ? 'text-black' : 'text-slate-600'}`}>
-                              {settings.department || 'Finance & Accounting'} • Operator:{' '}
-                              <strong>{settings.operatorName || 'N.Shaaeri'}</strong>
+                              {settings.department || 'Accounting Department'} • Operator:{' '}
+                              <strong>{settings.operatorName || 'Authorized Auditor'}</strong>
                             </p>
                             {options.memo && (
                               <p className={`text-[10px] italic ${options.colorMode === 'mono_black' ? 'text-black font-medium' : 'text-slate-500'} mt-0.5`}>

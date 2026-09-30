@@ -1,6 +1,6 @@
 export type NumberFormatType = 'comma_dot' | 'dot_comma' | 'space_dot' | 'apostrophe_dot';
 export type AppTheme = 'dark' | 'light';
-export type DateFormatType = 'EU' | 'US' | 'ISO';
+export type DateFormatType = 'ISO' | 'EU' | 'US';
 export type WorkspaceLayout = 'audit-right' | 'audit-left';
 export type DisplayStyle = 'vfd_emerald' | 'amber_glow' | 'oled_ice' | 'classic_lcd';
 export type UiScale = 'compact' | 'standard' | 'expanded';
@@ -31,7 +31,6 @@ export interface CalculatorSettings {
   companyName: string;
   department: string;
   operatorName: string;
-  logoDataUrl: string | null;
   historyLimit: number;
   thousandSeparator: string;
   decimalSeparator: string;
@@ -53,7 +52,7 @@ export type PrintPaperSize = 'A4' | 'Letter' | 'Legal' | 'Receipt';
 export type PrintOrientation = 'portrait' | 'landscape';
 export type PrintColorMode = 'color' | 'mono_black' | 'grayscale' | 'ink_saver';
 export type PrintDensity = 'compact' | 'standard' | 'spacious';
-export type PrintWatermark = 'NONE' | 'NUMERIX_IOOC' | 'CONFIDENTIAL' | 'DRAFT' | 'AUDITED' | 'APPROVED' | 'COPY';
+export type PrintWatermark = 'NONE' | 'NUMERIX' | 'CONFIDENTIAL' | 'DRAFT' | 'AUDITED' | 'APPROVED' | 'COPY';
 
 export interface PrintOptions {
   paperSize: PrintPaperSize;

@@ -1,52 +1,81 @@
 @import "tailwindcss";
 
+/* Ensure font-display: swap for instant text & numeric rendering with zero FOIT */
+@layer base {
+  @font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'JetBrains Mono';
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Vazirmatn';
+    font-display: swap;
+  }
+}
+
 :root {
   /* =========================================================================
      Responsive Fluid Clamp Scale for Laptops (1366x768), HD, 2K, and 4K Displays
      ========================================================================= */
 
   /* Global Layout Fluid Spacing */
-  --fluid-page-px: clamp(0.75rem, 1.5vw, 3rem);
-  --fluid-page-py: clamp(0.5rem, 1vh + 0.25rem, 2rem);
-  --fluid-grid-gap: clamp(0.75rem, 1.2vw + 0.25rem, 2rem);
+  --fluid-page-px: clamp(0.5rem, 1.2vw, 2.5rem);
+  --fluid-page-py: clamp(0.35rem, 0.8vh + 0.15rem, 1.5rem);
+  --fluid-grid-gap: clamp(0.5rem, 1vw + 0.2rem, 1.75rem);
 
   /* Calculator Display Scale */
-  --fluid-display-result: clamp(2rem, 2.5vw + 1rem, 4.75rem);
-  --fluid-display-min-h: clamp(48px, 4vh + 24px, 110px);
-  --fluid-display-expression: clamp(0.8rem, 0.4vw + 0.65rem, 1.25rem);
+  --fluid-display-result: clamp(1.85rem, 2.2vw + 0.85rem, 4.25rem);
+  --fluid-display-min-h: clamp(44px, 3.5vh + 20px, 96px);
+  --fluid-display-expression: clamp(0.75rem, 0.35vw + 0.6rem, 1.15rem);
 
   /* Keypad Dynamic Sizing & Enhanced Number Typography */
-  --fluid-btn-py: clamp(0.45rem, 0.6vh + 0.25rem, 1.25rem);
-  --fluid-btn-num-size: clamp(1.15rem, 0.8vw + 0.75rem, 2.25rem);
-  --fluid-btn-op-size: clamp(1.05rem, 0.7vw + 0.7rem, 2rem);
-  --fluid-btn-fn-size: clamp(0.7rem, 0.3vw + 0.55rem, 1.05rem);
-  --fluid-btn-enter-size: clamp(1.1rem, 0.8vw + 0.75rem, 2.25rem);
+  --fluid-btn-py: clamp(0.35rem, 0.5vh + 0.2rem, 1.1rem);
+  --fluid-btn-num-size: clamp(1.1rem, 0.75vw + 0.7rem, 2.1rem);
+  --fluid-btn-op-size: clamp(1rem, 0.65vw + 0.65rem, 1.85rem);
+  --fluid-btn-fn-size: clamp(0.68rem, 0.28vw + 0.52rem, 1rem);
+  --fluid-btn-enter-size: clamp(1.05rem, 0.75vw + 0.7rem, 2.1rem);
 
   /* Paper Tape & Layout Proportions */
-  --fluid-tape-min-h: clamp(200px, 30vh, 600px);
-  --fluid-tape-result-size: clamp(0.95rem, 0.45vw + 0.75rem, 1.6rem);
-  --fluid-tape-exp-size: clamp(0.75rem, 0.25vw + 0.6rem, 1.05rem);
+  --fluid-tape-min-h: clamp(180px, 28vh, 560px);
+  --fluid-tape-result-size: clamp(0.9rem, 0.4vw + 0.7rem, 1.5rem);
+  --fluid-tape-exp-size: clamp(0.72rem, 0.22vw + 0.58rem, 1rem);
 
   /* Analog Clock Dial Size */
-  --fluid-clock-dial: clamp(38px, 1.6vw + 18px, 56px);
+  --fluid-clock-dial: clamp(34px, 1.4vw + 16px, 52px);
 }
 
 @layer base {
   /* Fluid root scaling for rem-based elements across 1366x768, 1080p, 1440p, and 4K */
   html {
-    font-size: clamp(13.5px, 0.18vw + 11.5px, 18px);
+    font-size: clamp(13px, 0.16vw + 11px, 17.5px);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    font-family: 'Plus Jakarta Sans', 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     overflow-x: hidden;
   }
 
   code, kbd, samp, pre, .font-mono {
-    font-family: 'JetBrains Mono', 'Vazirmatn', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     font-feature-settings: 'tnum' on, 'zero' on;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Compact Laptop (1366x768) and low viewport height adaptations */
+@media (max-height: 768px) {
+  :root {
+    --fluid-page-py: 0.25rem;
+    --fluid-grid-gap: 0.5rem;
+    --fluid-display-result: clamp(1.6rem, 2vw + 0.7rem, 2.5rem);
+    --fluid-display-min-h: 40px;
+    --fluid-btn-py: 0.28rem;
   }
 }
 

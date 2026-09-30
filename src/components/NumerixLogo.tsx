@@ -5,6 +5,7 @@ interface NumerixLogoProps {
   variant?: 'full' | 'icon' | 'horizontal';
   isLight?: boolean;
   monochrome?: boolean;
+  animate?: boolean;
   className?: string;
 }
 
@@ -13,6 +14,7 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
   variant = 'full',
   isLight = false,
   monochrome = false,
+  animate = false,
   className = '',
 }) => {
   const sizeMap = {
@@ -72,7 +74,9 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
       viewBox="0 0 200 200"
       width={currentSize.icon}
       height={currentSize.icon}
-      className="shrink-0 drop-shadow-sm print:drop-shadow-none"
+      className={`shrink-0 drop-shadow-sm print:drop-shadow-none transition-all duration-500 ${
+        animate ? 'scale-105 filter drop-shadow-[0_0_10px_rgba(6,182,212,0.6)]' : ''
+      }`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -117,12 +121,14 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
         d="M 62 38 C 45 42, 32 58, 30 78 C 28 98, 44 118, 62 135 L 75 147 C 88 160, 94 174, 85 182 C 76 190, 58 184, 45 168 C 35 155, 30 135, 34 116 C 31 138, 38 162, 54 176 C 70 189, 92 185, 102 168 C 112 150, 98 128, 82 110 L 68 95 C 54 80, 50 64, 58 52 C 67 40, 84 44, 98 58 L 105 65 C 92 48, 78 34, 62 38 Z"
         fill="url(#numerix-navy-grad)"
         filter="url(#numerix-glow)"
+        style={animate ? { animation: 'nxArmWave 1000ms ease-out' } : undefined}
       />
 
       {/* 2. Top-Left to Bottom-Right Blue Stroke */}
       <path
         d="M 52 42 C 40 54, 38 72, 45 90 C 52 108, 68 124, 85 140 C 102 156, 118 170, 134 176 C 148 182, 160 174, 164 160 C 168 146, 158 132, 142 120 L 130 110 C 145 125, 155 140, 148 152 C 142 162, 128 162, 114 150 C 98 136, 82 118, 70 100 C 58 82, 52 64, 58 52 C 62 44, 68 40, 75 40 C 66 38, 58 38, 52 42 Z"
         fill="url(#numerix-blue-curve)"
+        style={animate ? { animation: 'nxArmWave 1000ms ease-out' } : undefined}
       />
 
       {/* 3. Orange & Teal Dynamic Ascending Arrow Arm */}
@@ -130,42 +136,46 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
         d="M 65 178 C 80 186, 100 178, 115 160 C 130 142, 140 118, 152 95 L 170 58 L 184 68 L 186 24 L 142 30 L 155 43 L 138 76 C 128 96, 118 116, 106 132 C 94 148, 80 162, 65 178 Z"
         fill="url(#numerix-orange-grad)"
         filter="url(#numerix-glow)"
+        style={animate ? { animation: 'nxArrowLaunch 1000ms cubic-bezier(0.34, 1.56, 0.64, 1)' } : undefined}
       />
 
       {/* Arrowhead Highlight */}
       <path
         d="M 186 24 L 142 30 L 155 43 L 172 40 L 148 85 L 162 78 L 186 24 Z"
         fill="url(#numerix-arrow-grad)"
+        style={animate ? { animation: 'nxArrowLaunch 1000ms cubic-bezier(0.34, 1.56, 0.64, 1)' } : undefined}
       />
 
       {/* 4. Left Orange Math Symbol (+ Plus) */}
-      <g filter="url(#numerix-glow)">
+      <g filter="url(#numerix-glow)" style={animate ? { animation: 'nxPopMath 800ms cubic-bezier(0.34, 1.56, 0.64, 1)' } : undefined}>
         <rect x="25" y="85" width="18" height="6" rx="3" fill="#F77F00" />
         <rect x="31" y="79" width="6" height="18" rx="3" fill="#F77F00" />
       </g>
 
       {/* 5. Right Orange/Teal Math Symbol (÷ Divide) */}
-      <g filter="url(#numerix-glow)">
+      <g filter="url(#numerix-glow)" style={animate ? { animation: 'nxPopMath 800ms cubic-bezier(0.34, 1.56, 0.64, 1) 100ms both' } : undefined}>
         <circle cx="168" cy="74" r="3.2" fill="#00A896" />
         <rect x="157" y="85" width="22" height="6" rx="3" fill="#00A896" />
         <circle cx="168" cy="102" r="3.2" fill="#00A896" />
       </g>
 
       {/* 6. Top-Right Math Symbol (× Multiply) */}
-      <g transform="translate(170, 52) rotate(45)">
+      <g transform="translate(170, 52) rotate(45)" style={animate ? { animation: 'nxPopMath 800ms cubic-bezier(0.34, 1.56, 0.64, 1) 150ms both' } : undefined}>
         <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#F77F00" />
         <rect x="-2" y="-8" width="4" height="16" rx="2" fill="#F77F00" />
       </g>
 
       {/* 7. Center Diamond Vortex & Numeric Digits (8, 3, 5, 7, 9) */}
-      <polygon points="100,74 114,100 100,126 86,100" fill="#021C35" opacity="0.85" />
-      <polygon points="100,78 110,100 100,122 90,100" fill="#003566" />
-      <text x="94" y="90" fontSize="7" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">8</text>
-      <text x="104" y="90" fontSize="7" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">3</text>
-      <text x="98" y="103" fontSize="8" fill="#F77F00" fontFamily="sans-serif" fontWeight="900">3</text>
-      <text x="98" y="115" fontSize="7" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">5</text>
-      <text x="92" y="122" fontSize="6" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">7</text>
-      <text x="104" y="122" fontSize="6" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">9</text>
+      <g style={animate ? { transformOrigin: '100px 100px', animation: 'nxSpinCenter 1000ms cubic-bezier(0.2, 0.9, 0.3, 1)' } : undefined}>
+        <polygon points="100,74 114,100 100,126 86,100" fill="#021C35" opacity="0.85" />
+        <polygon points="100,78 110,100 100,122 90,100" fill="#003566" />
+        <text x="94" y="90" fontSize="7" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">8</text>
+        <text x="104" y="90" fontSize="7" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">3</text>
+        <text x="98" y="103" fontSize="8" fill="#F77F00" fontFamily="sans-serif" fontWeight="900">3</text>
+        <text x="98" y="115" fontSize="7" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">5</text>
+        <text x="92" y="122" fontSize="6" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">7</text>
+        <text x="104" y="122" fontSize="6" fill="#64DFDF" fontFamily="sans-serif" fontWeight="900">9</text>
+      </g>
     </svg>
   );
 
@@ -190,11 +200,12 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
                   : isLight
                   ? 'text-[#002855] print:text-black'
                   : 'text-cyan-400 print:text-black'
-              } ${currentSize.text}`}
+              } ${currentSize.text} ${animate ? 'animate-pulse' : ''}`}
             >
               NUMERI
             </span>
             <span
+              style={animate ? { animation: 'nxShimmerX 1000ms ease-in-out' } : undefined}
               className={`tracking-wider ${
                 monochrome
                   ? 'text-black font-black print:text-black'
@@ -216,6 +227,35 @@ export const NumerixLogo: React.FC<NumerixLogoProps> = ({
             WEB CALCULATOR
           </span>
         </div>
+
+        {/* 1-Second Signature Animation Keyframes */}
+        {animate && (
+          <style>{`
+            @keyframes nxArrowLaunch {
+              0% { transform: scale(0.6) translate(-15px, 15px); opacity: 0.3; }
+              60% { transform: scale(1.1) translate(2px, -2px); opacity: 1; }
+              100% { transform: scale(1) translate(0, 0); opacity: 1; }
+            }
+            @keyframes nxArmWave {
+              0% { transform: scale(0.85); opacity: 0.5; }
+              100% { transform: scale(1); opacity: 1; }
+            }
+            @keyframes nxPopMath {
+              0% { transform: scale(0.2); opacity: 0; }
+              60% { transform: scale(1.2); opacity: 1; }
+              100% { transform: scale(1); opacity: 1; }
+            }
+            @keyframes nxSpinCenter {
+              0% { transform: rotate(-90deg) scale(0.6); opacity: 0.5; }
+              100% { transform: rotate(0deg) scale(1); opacity: 1; }
+            }
+            @keyframes nxShimmerX {
+              0% { filter: brightness(1) drop-shadow(0 0 0px #F77F00); }
+              50% { filter: brightness(1.6) drop-shadow(0 0 10px #F77F00); }
+              100% { filter: brightness(1) drop-shadow(0 0 0px #F77F00); }
+            }
+          `}</style>
+        )}
       </div>
     );
   }

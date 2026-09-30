@@ -183,15 +183,15 @@ export function parseClipboardFinancialData(text: string): number[] {
 /**
  * Formats expression for clear UI display with proper accounting symbols (×, ÷, −, +)
  */
-export function formatExpressionForDisplay(rawExpr: string, format: NumberFormatType = 'comma_dot'): string {
+export function formatExpressionForDisplay(rawExpr: string, _format: NumberFormatType = 'comma_dot'): string {
   if (!rawExpr) return '';
   
   return rawExpr
     .replace(/\*/g, ' × ')
     .replace(/\//g, ' ÷ ')
     .replace(/\+/g, ' + ')
-    .replace(/(?<=\S)-(?=\S)/g, ' − ')
-    .replace(/-(?=\d)/g, '−')
+    .replace(/(\S)-(\S)/g, '$1 − $2')
+    .replace(/-(\d)/g, '−$1')
     .replace(/\s+/g, ' ')
     .trim();
 }

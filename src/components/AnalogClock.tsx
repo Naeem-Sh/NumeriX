@@ -7,7 +7,7 @@ interface AnalogClockProps {
   dateFormat?: DateFormatType;
 }
 
-export const AnalogClock: React.FC<AnalogClockProps> = ({ theme = 'dark', dateFormat = 'EU' }) => {
+export const AnalogClock: React.FC<AnalogClockProps> = ({ theme = 'dark', dateFormat = 'ISO' }) => {
   const [timeStr, setTimeStr] = useState<string>('');
   const [dateStr, setDateStr] = useState<string>('');
 

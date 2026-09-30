@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { CalculationRecord, CalculatorSettings, WorkspaceLayout } from './types';
 import {
   DEFAULT_SETTINGS,
@@ -6,8 +6,6 @@ import {
   saveStoredSettings,
   loadStoredTape,
   saveStoredTape,
-  saveStoredLogo,
-  syncFromExternalStorage,
 } from './utils/storage';
 import {
   evaluateExpression,
@@ -30,8 +28,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { HelpModal } from './components/HelpModal';
 import { PrintPreviewModal } from './components/PrintPreviewModal';
 import { NumerixLogo } from './components/NumerixLogo';
-import { PWAInstallButton } from './components/PWAInstallButton';
-import { OfflineIndicator } from './components/OfflineIndicator';
+import { SplashScreen } from './components/SplashScreen';
 
 import {
   Settings as SettingsIcon,
@@ -62,9 +59,14 @@ export default function App() {
   // 1. Settings State
   const [settings, setSettings] = useState<CalculatorSettings>(() => {
     const loaded = loadStoredSettings();
-    // Ensure companyName is empty if user didn't explicitly set one
-    if (loaded.companyName === 'IOOC - Shiraz Office') {
+    if (loaded.companyName === 'IOOC - Shiraz Office' || loaded.companyName === 'Corporate Finance') {
       loaded.companyName = '';
+    }
+    if (loaded.operatorName === 'N.Shaaeri') {
+      loaded.operatorName = '';
+    }
+    if (loaded.department === 'Finance & Accounting') {
+      loaded.department = '';
     }
     if (!loaded.workspaceLayout) {
       loaded.workspaceLayout = 'audit-right';
@@ -88,7 +90,24 @@ export default function App() {
   const [pastStates, setPastStates] = useState<CalcStateSnapshot[]>([]);
   const [futureStates, setFutureStates] = useState<CalcStateSnapshot[]>([]);
 
-  // 3. Modals State
+  // 3. Modals & Splash State (Shown only once per work session)
+  const [showSplash, setShowSplash] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('numerix_splash_shown') !== 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const handleSplashFinish = useCallback(() => {
+    setShowSplash(false);
+    try {
+      sessionStorage.setItem('numerix_splash_shown', 'true');
+    } catch {
+      // Ignore sessionStorage issues if cookies/storage blocked
+    }
+  }, []);
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
@@ -103,17 +122,6 @@ export default function App() {
   // Reference for active key flash timeout
   const keyFlashTimeout = useRef<number | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
-
-  // Initial sync from persistent external storage (outside project folder)
-  useEffect(() => {
-    syncFromExternalStorage().then((data) => {
-      if (data) {
-        if (data.settings) setSettings(data.settings);
-        if (Array.isArray(data.tape) && data.tape.length > 0) setTapeRecords(data.tape);
-        if (data.logo !== undefined) saveStoredLogo(data.logo);
-      }
-    });
-  }, []);
 
   // Persist settings
   useEffect(() => {
@@ -1091,12 +1099,21 @@ export default function App() {
   return (
     <div
       id="app-root-container"
-      className={`min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-between font-sans transition-colors duration-200 lg:overflow-hidden ${themeContainerClass} ${uiScaleClass}`}
+      className={`min-h-[100dvh] lg:h-[100dvh] lg:max-h-[100dvh] flex flex-col justify-between font-sans transition-colors duration-200 lg:overflow-hidden ${themeContainerClass} ${uiScaleClass}`}
     >
+      {/* Introductory Snappy Logo Splash Screen (1500ms, shown only once per session) */}
+      {showSplash && (
+        <SplashScreen
+          onFinish={handleSplashFinish}
+          durationMs={1500}
+          theme={settings.theme}
+        />
+      )}
+
       {/* 1. Header Bar (Decluttered & Clean) */}
       <header
         id="app-header-bar"
-        className={`w-full border-b transition-all px-4 py-2 sm:px-6 lg:px-8 shrink-0 ${
+        className={`w-full border-b transition-all px-3 py-1.5 sm:px-6 lg:px-8 shrink-0 ${
           isLight ? 'bg-[#dedbd2] border-stone-300 shadow-xs' : 'bg-slate-900/90 border-slate-800 shadow-sm'
         }`}
       >
@@ -1212,9 +1229,6 @@ export default function App() {
                 <Moon className="w-4 h-4" />
               )}
             </button>
-
-            {/* Desktop App Install Button */}
-            <PWAInstallButton isLight={isLight} />
 
             {/* Settings Button */}
             <button
@@ -1456,18 +1470,16 @@ export default function App() {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onUpdateSettings={(newVals) => {
-          if (newVals.logoDataUrl !== undefined) {
-            saveStoredLogo(newVals.logoDataUrl);
-          }
           setSettings((prev) => ({ ...prev, ...newVals }));
         }}
         onResetDefaults={handleResetDefaults}
+        onReplaySplash={() => {
+          setIsSettingsOpen(false);
+          setShowSplash(true);
+        }}
         onRestoreWorkspace={(backup) => {
           setSettings(backup.settings);
           setTapeRecords(backup.tape);
-          if (backup.logo !== undefined) {
-            saveStoredLogo(backup.logo);
-          }
         }}
       />
 
@@ -1483,9 +1495,6 @@ export default function App() {
         records={tapeRecords}
         settings={settings}
       />
-
-      {/* 100% Offline Mode Banner */}
-      <OfflineIndicator />
     </div>
   );
 }

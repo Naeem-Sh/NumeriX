@@ -1,5 +1,3 @@
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { CalculationRecord, CalculatorSettings, PrintOptions } from '../types';
 import { formatAccountingNumber } from './numberFormat';
 import {
@@ -9,14 +7,25 @@ import {
   getNumerixMonoBlackEmblemPng,
 } from './numerixLogoAsset';
 
-export function generatePdfReport(
+/**
+ * Lazy-loads jsPDF and jspdf-autotable dynamically when a PDF report is generated.
+ * This removes ~300KB+ of PDF generation scripts from the initial page payload.
+ */
+export async function generatePdfReport(
   records: CalculationRecord[],
   settings: CalculatorSettings,
   customOptions?: Partial<PrintOptions>
-): void {
+): Promise<void> {
   if (records.length === 0) {
     return;
   }
+
+  // Dynamic on-demand imports of jsPDF and autoTable
+  const [{ jsPDF }, autoTableModule] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable'),
+  ]);
+  const autoTable: any = (autoTableModule as any).default || autoTableModule;
 
   const rawPaperFormat = (customOptions?.paperSize || 'A4').toLowerCase();
   const docFormat: 'a4' | 'letter' | 'legal' =
@@ -87,14 +96,14 @@ export function generatePdfReport(
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(15);
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.text(settings.companyName || 'Corporate Finance', headerLeftOffset, startY + 5);
+    doc.text(settings.companyName || 'Company / Organization', headerLeftOffset, startY + 5);
 
     // Department & Operator
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(100, 116, 139);
     doc.text(
-      `${settings.department || 'Finance & Accounting'} • Operator: ${settings.operatorName || 'N.Shaaeri'}`,
+      `${settings.department || 'Accounting Department'} • Operator: ${settings.operatorName || 'Authorized Auditor'}`,
       headerLeftOffset,
       startY + 11
     );
@@ -126,7 +135,7 @@ export function generatePdfReport(
     doc.saveGraphicsState();
     doc.setTextColor(220, 226, 235);
 
-    if (customOptions.watermark === 'NUMERIX_IOOC') {
+    if (customOptions.watermark === 'NUMERIX') {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(36);
       doc.text('NUMERIX AUDIT', pageWidth / 2, pageHeight / 2, {
@@ -281,7 +290,7 @@ export function generatePdfReport(
 
   // 4. Signatures if requested
   if (customOptions?.showSignatures) {
-    const finalY = (doc as any).lastAutoTable.finalY + 12;
+    const finalY = (doc as any).lastAutoTable?.finalY ?? startY;
     if (finalY + 25 < pageHeight) {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
@@ -300,4 +309,3 @@ export function generatePdfReport(
   const fileDate = new Date().toISOString().slice(0, 10);
   doc.save(`Calculation_Report_${fileDate}_${Date.now().toString().slice(-4)}.pdf`);
 }
-
