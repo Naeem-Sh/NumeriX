@@ -208,7 +208,7 @@ export interface WorkspaceBackupData {
 
 export function createWorkspaceBackup(): WorkspaceBackupData {
   return {
-    version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '2.3.1',
+    version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '2.3.2',
     exportedAt: new Date().toISOString(),
     app: 'NumeriX Financial Calculator',
     settings: loadStoredSettings(),

@@ -1,6 +1,6 @@
 # NumeriX — Professional Financial Calculator & Audit Tape
 
-> **Version:** 2.3.1  
+> **Version:** 2.3.2  
 > **Target:** Production Air-Gapped Intranet, Docker Container, and Desktop Appliance  
 > **License:** MIT  
 
@@ -10,9 +10,9 @@ NumeriX is a desktop-grade, air-gapped financial and accounting calculator engin
 
 ## 🔒 Air-Gapped & Offline Architecture
 
-- **Zero External Network Calls:** 100% self-contained. All fonts (Plus Jakarta Sans, JetBrains Mono, Vazirmatn), icons, vector graphics, audio synthesizers, and export engines are bundled locally into the container build.
-- **Air-Gap Validated:** Operates seamlessly in isolated corporate intranets and air-gapped secure enclaves without outbound internet access.
-- **Persistent Storage:** All calculation history, settings, and workspace preferences persist inside the `/data/numerix` volume.
+- **Zero External Network Calls:** 100% self-contained. All typography (Plus Jakarta Sans, JetBrains Mono, Vazirmatn), icons (Lucide React), vector graphics, audio synthesizers, and document export engines are bundled locally into the build.
+- **Air-Gap Validated:** Operates seamlessly in isolated corporate intranets and air-gapped secure enclaves without outbound internet access or DNS resolution.
+- **Authentication Status:** Not Applicable — no authentication layer present (stand-alone desktop calculator appliance).
 
 ---
 
@@ -37,33 +37,62 @@ http://localhost:9330
 
 ---
 
-## 🔑 Administrative Defaults & Environment
+## 📂 Standardized Persistent Storage (`DATA_DIR`)
 
-| Variable | Default Value | Description |
-| :--- | :--- | :--- |
-| `ADMIN_USERNAME` | `admin` | Default administrative account username |
-| `ADMIN_PASSWORD` | `123` | Default administrative account password |
-| `PORT` | `3000` | Internal application listening port (mapped to `9330` on host) |
-| `HOST` | `0.0.0.0` | Server bind host address |
-| `TZ` | `Asia/Tehran` | Timezone synchronization for audit timestamps |
-| `NUMERIX_DATA_DIR` | `/data/numerix` | Persistent volume path for calculation records |
+All persistent application state is consolidated under a single container root directory: `/app/data` (derived from `DATA_DIR`).
+
+### Volume Mapping
+```yaml
+volumes:
+  - ./data:/app/data
+  - /etc/localtime:/etc/localtime:ro
+```
+* **Intended Host Mapping:** `/opt/docker/numerix-calculator/data/` -> Container: `/app/data/`
+
+### Directory Layout
+```text
+/app/data/
+├── database.json      # Structured calculator state and settings store
+├── visits.json        # Appliance runtime health and visit metrics
+├── uploads/           # Custom logo or document asset staging
+└── backups/           # Auto-generated workspace and tape history archives
+```
+
+* **Empty Directory Tolerance:** The application boots cleanly when `/app/data` is initially empty, automatically initializing required subdirectories and starter schemas without crashing.
+* **Secrets Isolation:** No secrets, credentials, or private keys are ever stored within `/app/data`.
 
 ---
 
-## 📦 Container Specifications
+## 🔑 Environment Variables & In-Code Defaults
 
-- **Container Port:** `3000` (mapped to host port `9330` by default)
-- **Healthcheck Route:** `GET /healthz` (returns `200 OK` with uptime JSON)
-- **Volume Mount:** `numerix_data:/data/numerix` (named Docker volume)
-- **Timezone Sync:** Synchronized with `/etc/localtime:ro`
-- **Log Management:** Standard JSON logging limited to 10MB per file with 3 file rotation (`max-size: "10m"`, `max-file: "3"`)
-- **Signal Handling:** Managed by `tini` init system for zero-data-loss graceful shutdowns (`SIGTERM` / `SIGINT`)
+Every environment variable has a resilient in-code fallback ensuring instant, zero-stop boot:
+
+| Variable | Default Fallback | Description |
+| :--- | :--- | :--- |
+| `DATA_DIR` | `/app/data` | Root persistent storage directory |
+| `PORT` | `3000` | Internal listening port (mapped to `9330` on host) |
+| `HOST` | `0.0.0.0` | Network socket bind address |
+| `TZ` | `Asia/Tehran` | Timezone synchronization for audit paper tape timestamps |
+| `RESET_ADMIN_PASSWORD` | `false` | Prevents resetting updated credentials on container restart |
+| `JWT_SECRET` | `fallback-production-jwt-secret-replace-me` | Fallback secret for session token signing |
+| `INITIAL_ADMIN_USERNAME`| `admin` | Initial administrative username (bootstrap only) |
+| `INITIAL_ADMIN_PASSWORD`| `123` | Initial administrative password (bootstrap only) |
+
+---
+
+## 📦 Container Operations & Hardening
+
+- **Container Port:** `3000` (mapped to host port `9330`)
+- **Healthcheck Route:** `GET /healthz` (offline internal Node HTTP check returning `200 OK`)
+- **Init Process:** Managed by `tini` as PID 1 for signal forwarding (`SIGTERM`/`SIGINT`) and zombie reaping
+- **Non-Root Execution:** Runs under unprivileged user `node` (UID/GID 1000)
+- **Log Rotation:** Docker JSON logging capped at `10m` with 3 rotated files (`max-size: "10m"`, `max-file: "3"`)
 
 ---
 
 ## 🛠️ Verification & Quality Assurance
 
-To execute automated type check, bundle compilation, and air-gap sanity check:
+To execute the automated 6-stage verification suite:
 
 ```bash
 chmod +x verify.sh

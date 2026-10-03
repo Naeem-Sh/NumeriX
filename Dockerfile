@@ -1,5 +1,5 @@
 # =========================================================================
-# NumeriX Financial Calculator — Production Multi-Stage Container (v2.3.1)
+# NumeriX Financial Calculator — Production Multi-Stage Container (v2.3.2)
 # Air-gapped & Offline Ready (Zero external runtime dependencies)
 # =========================================================================
 
@@ -35,7 +35,11 @@ ENV NODE_ENV=production \
     PORT=3000 \
     HOST=0.0.0.0 \
     TZ=Asia/Tehran \
-    NUMERIX_DATA_DIR=/data/numerix
+    DATA_DIR=/app/data \
+    RESET_ADMIN_PASSWORD=false \
+    JWT_SECRET=fallback-production-jwt-secret-replace-me \
+    INITIAL_ADMIN_USERNAME=admin \
+    INITIAL_ADMIN_PASSWORD=123
 
 # Install only production dependencies
 COPY package*.json ./
@@ -45,7 +49,7 @@ RUN npm install --omit=dev && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 
 # Create persistent storage directory and set non-root ownership
-RUN mkdir -p /data/numerix && chown -R node:node /data/numerix /app
+RUN mkdir -p /app/data && chown -R node:node /app/data /app
 
 # Switch to non-root unprivileged user
 USER node
@@ -53,8 +57,8 @@ USER node
 # Expose internal service port
 EXPOSE 3000
 
-# Persistent volume definition for calculator workspace data
-VOLUME ["/data/numerix"]
+# Persistent volume definition for standardized data storage
+VOLUME ["/app/data"]
 
 # Fully self-contained offline healthcheck (zero curl/wget dependency)
 HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \

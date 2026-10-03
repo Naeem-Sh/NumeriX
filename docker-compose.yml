@@ -14,11 +14,13 @@ services:
       - PORT=3000
       - HOST=0.0.0.0
       - TZ=Asia/Tehran
-      - NUMERIX_DATA_DIR=/data/numerix
-      - ADMIN_USERNAME=admin
-      - ADMIN_PASSWORD=123
+      - DATA_DIR=/app/data
+      - RESET_ADMIN_PASSWORD=false
+      - JWT_SECRET=fallback-production-jwt-secret-replace-me
+      - INITIAL_ADMIN_USERNAME=admin
+      - INITIAL_ADMIN_PASSWORD=123
     volumes:
-      - numerix_data:/data/numerix
+      - ./data:/app/data
       - /etc/localtime:/etc/localtime:ro
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/healthz', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
@@ -31,7 +33,3 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-volumes:
-  numerix_data:
-    name: numerix_data_persistent

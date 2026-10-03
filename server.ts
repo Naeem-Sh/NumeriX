@@ -8,6 +8,63 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 const rawHost = process.env.BIND_HOST || process.env.HOST || '0.0.0.0';
 const HOST = /^(?:\d{1,3}\.){3}\d{1,3}$|^::$/.test(rawHost) || rawHost === 'localhost' ? rawHost : '0.0.0.0';
 
+// Mandatory In-Code Fallbacks (Zero-Stop Runtime)
+const DATA_DIR = process.env.DATA_DIR || '/app/data';
+const TZ = process.env.TZ || 'Asia/Tehran';
+const RESET_ADMIN_PASSWORD = process.env.RESET_ADMIN_PASSWORD || 'false';
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-production-jwt-secret-replace-me';
+const INITIAL_ADMIN_USERNAME = process.env.INITIAL_ADMIN_USERNAME || 'admin';
+const INITIAL_ADMIN_PASSWORD = process.env.INITIAL_ADMIN_PASSWORD || '123';
+
+// Storage Path Derivation (Strict structured resolution under DATA_DIR)
+const STORAGE_PATHS = {
+  root: DATA_DIR,
+  database: path.join(DATA_DIR, 'database.json'),
+  visits: path.join(DATA_DIR, 'visits.json'),
+  uploads: path.join(DATA_DIR, 'uploads'),
+  backups: path.join(DATA_DIR, 'backups'),
+};
+
+// Initialize Storage Directory Layout (Empty Directory Tolerance)
+function initializeStorage(): void {
+  try {
+    // 1. Ensure required subdirectories exist
+    if (!fs.existsSync(STORAGE_PATHS.uploads)) {
+      fs.mkdirSync(STORAGE_PATHS.uploads, { recursive: true });
+    }
+    if (!fs.existsSync(STORAGE_PATHS.backups)) {
+      fs.mkdirSync(STORAGE_PATHS.backups, { recursive: true });
+    }
+
+    // 2. Starter schema for database.json if not present
+    if (!fs.existsSync(STORAGE_PATHS.database)) {
+      const initialDatabase = {
+        app: 'NumeriX Financial Calculator',
+        version: '2.3.2',
+        initializedAt: new Date().toISOString(),
+        settings: {},
+        records: [],
+      };
+      fs.writeFileSync(STORAGE_PATHS.database, JSON.stringify(initialDatabase, null, 2), 'utf-8');
+    }
+
+    // 3. Starter schema for visits.json if not present
+    if (!fs.existsSync(STORAGE_PATHS.visits)) {
+      const initialVisits = {
+        totalVisits: 0,
+        lastVisit: null,
+      };
+      fs.writeFileSync(STORAGE_PATHS.visits, JSON.stringify(initialVisits, null, 2), 'utf-8');
+    }
+
+    console.log(`[NumeriX] Persistent storage initialized at: ${DATA_DIR}`);
+  } catch (err) {
+    console.error(`[NumeriX] Warning: Could not initialize storage directory ${DATA_DIR}:`, (err as Error).message);
+  }
+}
+
+initializeStorage();
+
 // Determine dist directory path reliably in both development and bundled production
 const distDir = fs.existsSync(path.resolve(process.cwd(), 'dist'))
   ? path.resolve(process.cwd(), 'dist')
@@ -27,12 +84,18 @@ app.use((_req, res, next) => {
 
 // Dedicated Air-Gapped Healthcheck Endpoints
 app.get(['/health', '/healthz'], (_req, res) => {
+  const isStorageReady = fs.existsSync(STORAGE_PATHS.database) && fs.existsSync(STORAGE_PATHS.visits);
   res.status(200).json({
     status: 'healthy',
     app: 'NumeriX Financial Calculator',
-    version: '2.3.1',
+    version: '2.3.2',
     timestamp: new Date().toISOString(),
     uptimeSeconds: Math.floor(process.uptime()),
+    timezone: TZ,
+    storage: {
+      dataDir: DATA_DIR,
+      ready: isStorageReady,
+    },
   });
 });
 
